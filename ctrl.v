@@ -53,7 +53,8 @@ module ctrl (
   wire itype_r = ~Op[6] & ~Op[5] & Op[4] & ~Op[3] & ~Op[2] & Op[1] & Op[0];  //0010011
   wire i_addi = itype_r & ~Funct3[2] & ~Funct3[1] & ~Funct3[0];  // addi 000
   wire i_ori = itype_r & Funct3[2] & Funct3[1] & ~Funct3[0];  // ori 110
-
+  wire lui = (Op == 7'b0110111);
+  wire auipc = (Op == 7'b0010111);
   //jalr
   wire i_jalr = Op[6] & Op[5] & ~Op[4] & ~Op[3] & Op[2] & Op[1] & Op[0];  //jalr 1100111
 
@@ -73,9 +74,9 @@ module ctrl (
   wire i_jal = Op[6] & Op[5] & ~Op[4] & Op[3] & Op[2] & Op[1] & Op[0];  // jal 1101111
 
   // generate control signals
-  assign RegWrite = rtype | itype_r | i_jalr | i_jal;  // register write
+  assign RegWrite = rtype | itype_r | i_jalr | i_jal | lui | auipc;  // register write
   assign MemWrite = stype;  // memory write
-  assign ALUSrc   = itype_r | stype | i_jal | i_jalr;  // ALU B is from instruction immediate
+  assign ALUSrc   = itype_r | stype | i_jal | i_jalr | lui | auipc;  // ALU B is from instruction immediate
 
   // signed extension
   // EXT_CTRL_ITYPE_SHAMT 6'b100000
@@ -86,10 +87,10 @@ module ctrl (
   // EXT_CTRL_JTYPE	      6'b000001
   assign EXTOp[5] = 0;
   //assign EXTOp[4]    =  i_ori | i_andi | i_jalr;
-  assign EXTOp[4] = i_ori;
+  assign EXTOp[4] = i_ori | i_addi;
   assign EXTOp[3] = stype;
   assign EXTOp[2] = sbtype;
-  assign EXTOp[1] = 0;
+  assign EXTOp[1] = lui | auipc;
   assign EXTOp[0] = i_jal;
 
 
@@ -111,8 +112,8 @@ module ctrl (
 
 
 
-  assign ALUOp[0] = itype_l | stype | i_addi | i_ori | i_add | i_or;
-  assign ALUOp[1] = i_jalr | itype_l | stype | i_addi | i_add | i_and;
+  assign ALUOp[0] = itype_l | stype | i_addi | i_ori | i_add | i_or | lui;
+  assign ALUOp[1] = i_jalr | itype_l | stype | i_addi | i_add | i_and | auipc;
   //assign ALUOp[2] = i_andi|i_and|i_ori|i_or|i_beq|i_sub;
   //assign ALUOp[3] = i_andi|i_and|i_ori|i_or;
   assign ALUOp[2] = i_and | i_ori | i_or | i_beq | i_sub;
