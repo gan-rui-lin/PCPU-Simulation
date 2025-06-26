@@ -49,7 +49,6 @@ module SCPU (
   wire [19:0] uimm, jimm;
   wire [31:0] immout;
   wire [31:0] aluout;
-  assign Addr_out = aluout;
   assign B = (ALUSrc) ? immout : RD2;
 
 
@@ -87,7 +86,7 @@ module SCPU (
   reg [31:0] ID_EX_PC, ID_EX_RD1, ID_EX_RD2, ID_EX_Imm;
   reg [4:0] ID_EX_rs1, ID_EX_rs2, ID_EX_rd;
   reg [4:0] ID_EX_ALUOp;
-  reg ID_EX_ALUSrc, ID_EX_RegWrite;
+  reg ID_EX_ALUSrc, ID_EX_RegWrite, ID_EX_MemWrite;
   reg [1:0] ID_EX_WDSel;
   reg [2:0] ID_EX_DMType;
   always @(posedge clk) begin
@@ -106,6 +105,7 @@ module SCPU (
       ID_EX_RegWrite <= RegWrite;
       ID_EX_WDSel <= WDSel;
       ID_EX_DMType <= DMType;
+      ID_EX_MemWrite <= MemWrite;
     end
   end
 
@@ -125,7 +125,7 @@ module SCPU (
       EX_MEM_RD2 <= ID_EX_RD2;
       EX_MEM_rd <= ID_EX_rd;
       EX_MEM_RegWrite <= ID_EX_RegWrite;
-      EX_MEM_MemWrite <= MemWrite;
+      EX_MEM_MemWrite <= ID_EX_MemWrite;
       EX_MEM_WDSel <= ID_EX_WDSel;
       EX_MEM_DMType <= ID_EX_DMType;
     end
@@ -135,9 +135,9 @@ module SCPU (
 
   // MEM/WB
   reg MEM_WB_valid;
-  reg [31:0] MEM_WB_MemData, MEM_WB_ALUResult, MEM_WB_PC;
+  reg [31:0] MEM_WB_MemData, MEM_WB_ALUResult, MEM_WB_PC, MEM_WB_RD2;
   reg [4:0] MEM_WB_rd;
-  reg MEM_WB_RegWrite;
+  reg MEM_WB_RegWrite, MEM_WB_MemWrite;
   reg [1:0] MEM_WB_WDSel;
   always @(posedge clk) begin
     if (reset) MEM_WB_valid <= 0;
@@ -147,8 +147,10 @@ module SCPU (
       MEM_WB_MemData <= Data_in;
       MEM_WB_ALUResult <= EX_MEM_ALUResult;
       MEM_WB_rd <= EX_MEM_rd;
+      MEM_WB_RD2 <= EX_MEM_RD2;
       MEM_WB_RegWrite <= EX_MEM_RegWrite;
       MEM_WB_WDSel <= EX_MEM_WDSel;
+      MEM_WB_MemWrite <= EX_MEM_MemWrite;
     end
   end
 
@@ -217,9 +219,9 @@ module SCPU (
       .PC(ID_EX_PC)
   );
 
-  assign Addr_out = EX_MEM_ALUResult; // 传给外层的 sccomp
-  assign Data_out = EX_MEM_RD2;     // 传给外层的 sccomp
-  assign mem_w = EX_MEM_MemWrite;   // 传给外层的 sccomp
+  assign Addr_out = MEM_WB_ALUResult; // 传给外层的 sccomp
+  assign Data_out = MEM_WB_RD2;     // 传给外层的 sccomp
+  assign mem_w = MEM_WB_MemWrite;   // 传给外层的 sccomp
 
   always @* begin
     case (MEM_WB_WDSel)

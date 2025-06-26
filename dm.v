@@ -56,7 +56,7 @@ module dm (
       `dm_byte_unsigned:
         dout = {24'b0, word[7:0]};
 
-      default: dout = 32'b0;
+      default: dout = 32'hffffffff;
     endcase
   end
 

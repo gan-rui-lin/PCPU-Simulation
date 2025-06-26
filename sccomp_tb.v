@@ -20,7 +20,7 @@ module sccomp_tb ();
   initial begin
     // $readmemh("Test_8_Instr.dat", U_SCCOMP.U_IM.ROM, 0,
     $readmemh("sim1.dat", U_SCCOMP.U_IM.ROM, 0,
-              31);  // load instructions into instruction memory
+              30);  // load instructions into instruction memory
     // $monitor("PC = 0x%8X, instr = 0x%8X", U_SCCOMP.PC, U_SCCOMP.instr); // used for debug
     foutput = $fopen("results.txt");
     debug_output = $fopen("debug.txt");
@@ -111,11 +111,11 @@ module sccomp_tb ();
                     U_SCCOMP.U_SCPU.ID_EX_Imm);
           $fdisplay(
               debug_output,
-              "rs1 = %d, rs2 = %d, rd = %d, ALUOp = %h, ALUSrc = %b, RegWrite = %b, WDSel = %b, DMType = %h",
+              "rs1 = %d, rs2 = %d, rd = %d, ALUOp = %h, ALUSrc = %b, RegWrite = %b, WDSel = %b, DMType = %h, MemWrite = %h",
               U_SCCOMP.U_SCPU.ID_EX_rs1, U_SCCOMP.U_SCPU.ID_EX_rs2, U_SCCOMP.U_SCPU.ID_EX_rd,
               U_SCCOMP.U_SCPU.ID_EX_ALUOp, U_SCCOMP.U_SCPU.ID_EX_ALUSrc,
               U_SCCOMP.U_SCPU.ID_EX_RegWrite, U_SCCOMP.U_SCPU.ID_EX_WDSel,
-              U_SCCOMP.U_SCPU.ID_EX_DMType);
+              U_SCCOMP.U_SCPU.ID_EX_DMType, U_SCCOMP.U_SCPU.ID_EX_MemWrite);
 
           // ----- EX/MEM -----
           $fdisplay(debug_output, "----- EX/MEM -----");

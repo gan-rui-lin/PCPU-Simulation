@@ -53,6 +53,11 @@ module ctrl (
   wire itype_r = ~Op[6] & ~Op[5] & Op[4] & ~Op[3] & ~Op[2] & Op[1] & Op[0];  //0010011
   wire i_addi = itype_r & ~Funct3[2] & ~Funct3[1] & ~Funct3[0];  // addi 000
   wire i_ori = itype_r & Funct3[2] & Funct3[1] & ~Funct3[0];  // ori 110
+  wire i_andi = itype_r & (Funct3 == 3'b111);
+  wire i_xori = itype_r & (Funct3 == 3'b100);
+  wire i_srai = itype_r & (Funct3 == 3'b101);
+  wire i_slli = itype_r & (Funct3 == 3'b001);
+
   wire lui = (Op == 7'b0110111);
   wire auipc = (Op == 7'b0010111);
   //jalr
@@ -114,10 +119,8 @@ module ctrl (
 
   assign ALUOp[0] = itype_l | stype | i_addi | i_ori | i_add | i_or | lui;
   assign ALUOp[1] = i_jalr | itype_l | stype | i_addi | i_add | i_and | auipc;
-  //assign ALUOp[2] = i_andi|i_and|i_ori|i_or|i_beq|i_sub;
-  //assign ALUOp[3] = i_andi|i_and|i_ori|i_or;
-  assign ALUOp[2] = i_and | i_ori | i_or | i_beq | i_sub;
-  assign ALUOp[3] = i_and | i_ori | i_or;
+  assign ALUOp[2] = i_andi|i_and|i_ori|i_or|i_beq|i_sub;
+  assign ALUOp[3] = i_andi|i_and|i_ori|i_or;
   assign ALUOp[4] = 0;
 
   assign DMType[0] = lh | sh | sb | lb;
