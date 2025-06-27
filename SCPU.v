@@ -97,7 +97,7 @@ module SCPU (
       ID_EX_NPCOp <= `NPC_PLUS4;  // 初始化为默认值
       ID_EX_PC <= 0;
     end else begin
-      ID_EX_Inst <=  IF_ID_Inst;
+      ID_EX_Inst <= IF_ID_Inst;
       ID_EX_valid <= IF_ID_valid;
       ID_EX_PC <= IF_ID_PC;  // 往后传就是了
       ID_EX_RD1 <= RD1;
@@ -193,17 +193,19 @@ module SCPU (
   reg [ 2:0] True_NPCOp;
 
   // 用 case 替代三目运算符，解决 xxx 问题
-  // True_PC_for_next 在 EX 阶段准备好, 同理 NPC; 在 MEM 阶段写入新的正确的 PC
+  // // True_PC_for_next 在 EX 阶段准备好, 同理 NPC; 在 MEM 阶段写入新的正确的 PC
+  // 修改为 ID 阶段全判断
+  wire Can_Branch;
   always @* begin
-    case (ID_EX_NPCOp)
+    case (NPCOp)
       `NPC_JALR, `NPC_JUMP: begin
-        True_PC_for_next <= ID_EX_PC;
-        True_NPCOp <= ID_EX_NPCOp;
+        True_PC_for_next <= IF_ID_PC;
+        True_NPCOp <= NPCOp;
       end
       `NPC_BRANCH: begin
-        if (Zero == 1) begin
-          True_PC_for_next <= ID_EX_PC;
-          True_NPCOp <= ID_EX_NPCOp;
+        if (Can_Branch == 1) begin
+          True_PC_for_next <= IF_ID_PC;
+          True_NPCOp <= NPCOp;
         end else begin
           True_PC_for_next <= PC_out;
           True_NPCOp <= `NPC_PLUS4;
@@ -216,11 +218,13 @@ module SCPU (
     endcase
   end
 
+  wire[31:0] jalr_next = RD1 + immout;
+
   NPC U_NPC (
       .PC(True_PC_for_next),
       .NPCOp(True_NPCOp),
-      .IMM(ID_EX_Imm),
-      .aluout(aluout),
+      .IMM(immout),
+      .aluout(jalr_next),
       .NPC(NPC)
   );
   EXT U_EXT (
@@ -256,6 +260,17 @@ module SCPU (
       .C(aluout),
       .Zero(Zero),
       .PC(ID_EX_PC)
+  );
+
+  wire [31:0] alu_B_ID = (ALUSrc) ? immout : RD2;
+  wire not_used;
+  alu U_alu_Btype (
+      .A(RD1),
+      .B(alu_B_ID),
+      .ALUOp(ALUOp),
+      .C(not_used),
+      .Zero(Can_Branch),
+      .PC(IF_ID_PC)
   );
 
   // 在 MEM 阶段传递地址、待写数据(下周期真正写) 给DM 模块, WB 阶段读出 Data_in 准备写回寄存器(下周期写);
