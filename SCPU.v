@@ -56,8 +56,9 @@ module SCPU (
   reg IF_ID_valid;
   reg [31:0] IF_ID_PC, IF_ID_Inst;
   always @(posedge clk) begin
-    if (reset) IF_ID_valid <= 0;
-    else begin
+    if (reset) begin
+      IF_ID_valid <= 0;
+    end else begin
       IF_ID_valid <= 1;
       IF_ID_PC <= PC_out;
       IF_ID_Inst <= inst_in;
@@ -86,12 +87,16 @@ module SCPU (
   reg [31:0] ID_EX_PC, ID_EX_RD1, ID_EX_RD2, ID_EX_Imm;
   reg [4:0] ID_EX_rs1, ID_EX_rs2, ID_EX_rd;
   reg [4:0] ID_EX_ALUOp;
+  reg [2:0] ID_EX_NPCOp;
   reg ID_EX_ALUSrc, ID_EX_RegWrite, ID_EX_MemWrite;
   reg [1:0] ID_EX_WDSel;
   reg [2:0] ID_EX_DMType;
   always @(posedge clk) begin
-    if (reset) ID_EX_valid <= 0;
-    else begin
+    if (reset) begin
+      ID_EX_valid <= 0;
+      ID_EX_NPCOp <= `NPC_PLUS4;  // 初始化为默认值
+      ID_EX_PC <= 0;
+    end else begin
       ID_EX_valid <= IF_ID_valid;
       ID_EX_PC <= IF_ID_PC;  // 往后传就是了
       ID_EX_RD1 <= RD1;
@@ -106,6 +111,7 @@ module SCPU (
       ID_EX_WDSel <= WDSel;
       ID_EX_DMType <= DMType;
       ID_EX_MemWrite <= MemWrite;
+      ID_EX_NPCOp <= NPCOp;
     end
   end
 
@@ -114,6 +120,7 @@ module SCPU (
   reg [31:0] EX_MEM_ALUResult, EX_MEM_RD2, EX_MEM_PC;
   reg [4:0] EX_MEM_rd;
   reg EX_MEM_RegWrite, EX_MEM_MemWrite;
+  reg [2:0] EX_MEM_NPCOp;
   reg [1:0] EX_MEM_WDSel;
   reg [2:0] EX_MEM_DMType;
   always @(posedge clk) begin
@@ -122,6 +129,7 @@ module SCPU (
       EX_MEM_valid <= ID_EX_valid;
       EX_MEM_PC <= ID_EX_PC;  // 最终到 MEM_WB_PC
       EX_MEM_ALUResult <= aluout;
+      EX_MEM_NPCOp <= NPCOp;
       EX_MEM_RD2 <= ID_EX_RD2;
       EX_MEM_rd <= ID_EX_rd;
       EX_MEM_RegWrite <= ID_EX_RegWrite;
@@ -177,10 +185,28 @@ module SCPU (
       .NPC(NPC),
       .PC (PC_out)
   );
+
+  reg [31:0] True_PC_for_next;
+  reg [ 2:0] True_NPCOp;
+
+  // 用 case 替代三目运算符，解决 xxx 问题
+  always @* begin
+    case (ID_EX_NPCOp)
+      `NPC_JALR, `NPC_JUMP: begin
+        True_PC_for_next = ID_EX_PC;
+        True_NPCOp = ID_EX_NPCOp;
+      end
+      default: begin
+        True_PC_for_next = PC_out;
+        True_NPCOp = `NPC_PLUS4;
+      end
+    endcase
+  end
+
   NPC U_NPC (
-      .PC(PC_out),
-      .NPCOp(NPCOp),
-      .IMM(immout),
+      .PC(True_PC_for_next),
+      .NPCOp(True_NPCOp),
+      .IMM(ID_EX_Imm),
       .aluout(aluout),
       .NPC(NPC)
   );

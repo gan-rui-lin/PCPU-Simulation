@@ -15,15 +15,17 @@ module sccomp_tb ();
 
   integer foutput;
   integer debug_output;
+  integer pc_output;
   integer counter = 0;
 
   initial begin
     // $readmemh("Test_8_Instr.dat", U_SCCOMP.U_IM.ROM, 0,
-    $readmemh("sim1.dat", U_SCCOMP.U_IM.ROM, 0,
-              30);  // load instructions into instruction memory
+    $readmemh("sim5.dat", U_SCCOMP.U_IM.ROM, 0,
+              26);  // load instructions into instruction memory
     // $monitor("PC = 0x%8X, instr = 0x%8X", U_SCCOMP.PC, U_SCCOMP.instr); // used for debug
     foutput = $fopen("results.txt");
     debug_output = $fopen("debug.txt");
+    pc_output = $fopen("pc.txt");
     // 打开 VCD 波形记录
     $dumpfile("a.vcd");
     $dumpvars(0, sccomp_tb);
@@ -41,7 +43,7 @@ module sccomp_tb ();
     #(50) clk = ~clk;
 
     if (clk == 1'b1) begin
-      if ((counter == 1000) || (U_SCCOMP.U_SCPU.PC_out === 32'hxxxxxxxx)) begin
+      if ((counter == 1000) /*|| (U_SCCOMP.U_SCPU.PC_out === 32'hxxxxxxxx) */ ) begin
         $fclose(foutput);
         $stop;
       end else begin
@@ -77,12 +79,13 @@ module sccomp_tb ();
           $stop;
         end else begin
           counter = counter + 1;
-          //          $display("pc: %h", U_SCCOMP.U_SCPU.PC);
+                   $display("pc: %h", U_SCCOMP.PC);
           //          $display("instr: %h", U_SCCOMP.U_SCPU.instr);
         end
 
         // 无论如何, 写入调试日志
         if (counter < 32) begin
+          $fdisplay(pc_output, "PC = %h", U_SCCOMP.U_SCPU.PC_out);
           $fdisplay(debug_output, "Cycle %0d", counter);
 
           // ----- Actual In and Out -----
