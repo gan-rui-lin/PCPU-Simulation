@@ -20,8 +20,8 @@ module sccomp_tb ();
 
   initial begin
     // $readmemh("Test_8_Instr.dat", U_SCCOMP.U_IM.ROM, 0,
-    $readmemh("sim5.dat", U_SCCOMP.U_IM.ROM, 0,
-              26);  // load instructions into instruction memory
+    $readmemh("sim6.dat", U_SCCOMP.U_IM.ROM, 0,
+              192);  // load instructions into instruction memory
     // $monitor("PC = 0x%8X, instr = 0x%8X", U_SCCOMP.PC, U_SCCOMP.instr); // used for debug
     foutput = $fopen("results.txt");
     debug_output = $fopen("debug.txt");
@@ -43,11 +43,11 @@ module sccomp_tb ();
     #(50) clk = ~clk;
 
     if (clk == 1'b1) begin
-      if ((counter == 1000) /*|| (U_SCCOMP.U_SCPU.PC_out === 32'hxxxxxxxx) */ ) begin
+      if ((counter == 1000) || (U_SCCOMP.U_SCPU.PC_out === 32'hxxxxxxxx)) begin
         $fclose(foutput);
         $stop;
       end else begin
-        if (U_SCCOMP.PC == 32'h128) begin
+        if (U_SCCOMP.PC == 1024) begin
           counter = counter + 1;
           $fdisplay(foutput, "pc:\t %h", U_SCCOMP.PC);
           $fdisplay(foutput, "instr:\t\t %h", U_SCCOMP.instr);
@@ -83,9 +83,9 @@ module sccomp_tb ();
           //          $display("instr: %h", U_SCCOMP.U_SCPU.instr);
         end
 
+        $fdisplay(pc_output, "PC = %h", U_SCCOMP.U_SCPU.PC_out);
         // 无论如何, 写入调试日志
         if (counter < 32) begin
-          $fdisplay(pc_output, "PC = %h", U_SCCOMP.U_SCPU.PC_out);
           $fdisplay(debug_output, "Cycle %0d", counter);
 
           // ----- Actual In and Out -----

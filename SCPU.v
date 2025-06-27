@@ -84,7 +84,7 @@ module SCPU (
 
   // ID/EX
   reg ID_EX_valid;
-  reg [31:0] ID_EX_PC, ID_EX_RD1, ID_EX_RD2, ID_EX_Imm;
+  reg [31:0] ID_EX_PC, ID_EX_RD1, ID_EX_RD2, ID_EX_Imm, ID_EX_Inst;
   reg [4:0] ID_EX_rs1, ID_EX_rs2, ID_EX_rd;
   reg [4:0] ID_EX_ALUOp;
   reg [2:0] ID_EX_NPCOp;
@@ -97,6 +97,7 @@ module SCPU (
       ID_EX_NPCOp <= `NPC_PLUS4;  // 初始化为默认值
       ID_EX_PC <= 0;
     end else begin
+      ID_EX_Inst <=  IF_ID_Inst;
       ID_EX_valid <= IF_ID_valid;
       ID_EX_PC <= IF_ID_PC;  // 往后传就是了
       ID_EX_RD1 <= RD1;
@@ -117,7 +118,7 @@ module SCPU (
 
   // EX/MEM
   reg EX_MEM_valid;
-  reg [31:0] EX_MEM_ALUResult, EX_MEM_RD2, EX_MEM_PC;
+  reg [31:0] EX_MEM_ALUResult, EX_MEM_RD2, EX_MEM_PC, EX_MEM_Inst;
   reg [4:0] EX_MEM_rd;
   reg EX_MEM_RegWrite, EX_MEM_MemWrite;
   reg [2:0] EX_MEM_NPCOp;
@@ -126,6 +127,7 @@ module SCPU (
   always @(posedge clk) begin
     if (reset) EX_MEM_valid <= 0;
     else begin
+      EX_MEM_Inst <= ID_EX_Inst;
       EX_MEM_valid <= ID_EX_valid;
       EX_MEM_PC <= ID_EX_PC;  // 最终到 MEM_WB_PC
       EX_MEM_ALUResult <= aluout;
@@ -143,13 +145,14 @@ module SCPU (
 
   // MEM/WB
   reg MEM_WB_valid;
-  reg [31:0] MEM_WB_MemData, MEM_WB_ALUResult, MEM_WB_PC, MEM_WB_RD2;
+  reg [31:0] MEM_WB_MemData, MEM_WB_ALUResult, MEM_WB_PC, MEM_WB_RD2, MEM_WB_Inst;
   reg [4:0] MEM_WB_rd;
   reg MEM_WB_RegWrite, MEM_WB_MemWrite;
   reg [1:0] MEM_WB_WDSel;
   always @(posedge clk) begin
     if (reset) MEM_WB_valid <= 0;
     else begin
+      MEM_WB_Inst <= EX_MEM_Inst;
       MEM_WB_PC <= EX_MEM_PC;
       MEM_WB_valid <= EX_MEM_valid;
       MEM_WB_MemData <= Data_in;
@@ -195,6 +198,15 @@ module SCPU (
       `NPC_JALR, `NPC_JUMP: begin
         True_PC_for_next = ID_EX_PC;
         True_NPCOp = ID_EX_NPCOp;
+      end
+      `NPC_BRANCH: begin
+        if (Zero == 1) begin
+          True_PC_for_next = ID_EX_PC;
+          True_NPCOp = ID_EX_NPCOp;
+        end else begin
+          True_PC_for_next = PC_out;
+          True_NPCOp = `NPC_PLUS4;
+        end
       end
       default: begin
         True_PC_for_next = PC_out;
