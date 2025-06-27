@@ -37,7 +37,7 @@ module sccomp (
       .clk   (clk),           // input:  cpu clock
       .DMWr  (MemWrite),      // input:  ram write
       .DMType(DMType),
-      .addr  (dm_addr[8:2]),  // input:  ram address
+      .addr  (dm_addr[8:0]),  // input:  ram address
       .din   (dm_din),        // input:  data to ram
       .dout  (dm_dout)        // output: data from ram
   );

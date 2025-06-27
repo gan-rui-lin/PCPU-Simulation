@@ -12,52 +12,59 @@ module dm (
   input clk;
   input DMWr;
   input [2:0] DMType;
-  input [8:2] addr;
+  input [8:0] addr;
   input [31:0] din;
   output reg [31:0] dout;
 
-  reg [31:0] dmem[127:0];
-  wire [31:0] word = dmem[addr];
+  reg [7:0] dmem[(1 << 9) - 1:0];
 
   // 写操作（时钟上升沿）
   always @(posedge clk) begin
     if (DMWr) begin
       case (DMType)
-        `dm_word: dmem[addr] <= din;
-
+        `dm_byte: dmem[addr] <= din[7:0];
+        `dm_byte_unsigned: dmem[addr] <= din[7:0];
         `dm_halfword: begin
-            dmem[addr] <= {din[15:0], word[15:0]};
+          dmem[addr]   <= din[7:0];
+          dmem[addr+1] <= din[15:8];
         end
-
-        `dm_byte: begin
-          dmem[addr] <= {din[7:0], word[23:0]};
+        `dm_halfword_unsigned: begin
+          dmem[addr]   <= din[7:0];
+          dmem[addr+1] <= din[15:8];
         end
-
-        default: ;  // 不写
+        `dm_word: begin
+          dmem[addr]   <= din[7:0];
+          dmem[addr+1] <= din[15:8];
+          dmem[addr+2] <= din[23:16];
+          dmem[addr+3] <= din[31:24];
+        end
       endcase
-
-      $display("dmem[0x%08X] = 0x%08X,", {addr, 2'b00}, din);
     end
   end
 
   always @(*) begin
     case (DMType)
-      `dm_word: dout = word;
-
-      `dm_halfword:
-        dout = {{16{word[15]}}, word[15:0]};
-
-      `dm_halfword_unsigned:
-        dout = {16'b0, word[15:0]};
-
-      `dm_byte:
-        dout = {{24{word[7]}}, word[7:0]};
-
-      `dm_byte_unsigned:
-        dout = {24'b0, word[7:0]};
-
-      default: dout = 32'hffffffff;
+      `dm_byte: begin
+        dout = {{24{dmem[addr][7]}}, dmem[addr][7:0]};
+      end
+      `dm_byte_unsigned: begin
+        dout = {24'b0, dmem[addr][7:0]};
+      end
+      `dm_halfword: begin
+        dout = {{16{dmem[addr+1][7]}}, dmem[addr+1][7:0], dmem[addr][7:0]};
+      end
+      `dm_halfword_unsigned: begin
+        dout = {16'b0, dmem[addr+1][7:0], dmem[addr][7:0]};
+      end
+      `dm_word: begin
+        dout = {dmem[addr+3][7:0], dmem[addr+2][7:0], dmem[addr+1][7:0], dmem[addr][7:0]};
+      end
+      default: begin
+        dout = 32'b0;
+      end
     endcase
   end
+
+
 
 endmodule

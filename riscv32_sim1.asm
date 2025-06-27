@@ -46,6 +46,7 @@
 0x1c	0x00000013	addi x0 x0 0	addi x0, x0, 0
 0x20	0x00000013	addi x0 x0 0	addi x0, x0, 0
 0x24	0x00000013	addi x0 x0 0	addi x0, x0, 0
+F4 F4 F4 F3 F4 F3 F2 F1
 0x28	0x00500023	sb x5 0(x0)	sb x5, 0(x0) #数据内存地址0处的字节设置为0xF4
 0x2c	0x005000A3	sb x5 1(x0)	sb x5, 1(x0) #数据内存地址1处的字节设置为0xF4
 0x30	0x00501123	sh x5 2(x0)	sh x5, 2(x0) #数据内存地址2处的双字节设置为0xF3F4

@@ -155,7 +155,7 @@ module SCPU (
       MEM_WB_Inst <= EX_MEM_Inst;
       MEM_WB_PC <= EX_MEM_PC;
       MEM_WB_valid <= EX_MEM_valid;
-      MEM_WB_MemData <= Data_in;
+      MEM_WB_MemData <= Data_in; // EX/MEM 阶段提供读信号, MEM/WB 等待上升沿接收数据
       MEM_WB_ALUResult <= EX_MEM_ALUResult;
       MEM_WB_rd <= EX_MEM_rd;
       MEM_WB_RD2 <= EX_MEM_RD2;
@@ -257,9 +257,9 @@ module SCPU (
       .PC(ID_EX_PC)
   );
 
-  assign Addr_out = MEM_WB_ALUResult; // 传给外层的 sccomp
-  assign Data_out = MEM_WB_RD2;     // 传给外层的 sccomp
-  assign mem_w = MEM_WB_MemWrite;   // 传给外层的 sccomp
+  assign Addr_out = EX_MEM_ALUResult; // 传给外层的 sccomp
+  assign Data_out = EX_MEM_RD2;     // 传给外层的 sccomp
+  assign mem_w = EX_MEM_MemWrite;   // 传给外层的 sccomp
 
   always @* begin
     case (MEM_WB_WDSel)
