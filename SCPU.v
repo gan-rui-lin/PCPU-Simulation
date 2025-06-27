@@ -193,24 +193,25 @@ module SCPU (
   reg [ 2:0] True_NPCOp;
 
   // 用 case 替代三目运算符，解决 xxx 问题
+  // True_PC_for_next 在 EX 阶段准备好, 同理 NPC; 在 MEM 阶段写入新的正确的 PC
   always @* begin
     case (ID_EX_NPCOp)
       `NPC_JALR, `NPC_JUMP: begin
-        True_PC_for_next = ID_EX_PC;
-        True_NPCOp = ID_EX_NPCOp;
+        True_PC_for_next <= ID_EX_PC;
+        True_NPCOp <= ID_EX_NPCOp;
       end
       `NPC_BRANCH: begin
         if (Zero == 1) begin
-          True_PC_for_next = ID_EX_PC;
-          True_NPCOp = ID_EX_NPCOp;
+          True_PC_for_next <= ID_EX_PC;
+          True_NPCOp <= ID_EX_NPCOp;
         end else begin
-          True_PC_for_next = PC_out;
-          True_NPCOp = `NPC_PLUS4;
+          True_PC_for_next <= PC_out;
+          True_NPCOp <= `NPC_PLUS4;
         end
       end
       default: begin
-        True_PC_for_next = PC_out;
-        True_NPCOp = `NPC_PLUS4;
+        True_PC_for_next <= PC_out;
+        True_NPCOp <= `NPC_PLUS4;
       end
     endcase
   end
@@ -257,6 +258,7 @@ module SCPU (
       .PC(ID_EX_PC)
   );
 
+  // 在 MEM 阶段传递地址、待写数据(下周期真正写) 给DM 模块, WB 阶段读出 Data_in 准备写回寄存器(下周期写);
   assign Addr_out = EX_MEM_ALUResult; // 传给外层的 sccomp
   assign Data_out = EX_MEM_RD2;     // 传给外层的 sccomp
   assign mem_w = EX_MEM_MemWrite;   // 传给外层的 sccomp
