@@ -52,5 +52,4 @@
 `define dm_byte 3'b011
 `define dm_byte_unsigned 3'b100
 
-`define WIDTH 200
-
+`define NOP 32'h00000013

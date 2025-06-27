@@ -30,8 +30,13 @@ module RF (
     end
 
 
-  assign RD1 = (A1 != 0) ? rf[A1] : 0;
-  assign RD2 = (A2 != 0) ? rf[A2] : 0;
+  // "WB-EX" 旁路
+assign RD1 = (A1 == 0) ? 32'b0 :
+             (A1 == A3) ? WD : rf[A1];
+
+assign RD2 = (A2 == 0) ? 32'b0 :
+             (A2 == A3) ? WD : rf[A2];
+
   assign reg_data = (reg_sel != 0) ? rf[reg_sel] : 0;
 
 endmodule

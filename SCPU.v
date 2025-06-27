@@ -53,17 +53,23 @@ module SCPU (
 
 
   // IF/ID
+  // 考虑 beq 跳转成功(ID 阶段判断) flush 掉 IF 阶段的指令
   reg IF_ID_valid;
+  reg IF_Flush;
   reg [31:0] IF_ID_PC, IF_ID_Inst;
   always @(posedge clk) begin
     if (reset) begin
       IF_ID_valid <= 0;
+    end else if (IF_Flush) begin
+      IF_ID_PC   <= 32'hffffffff;  // not used
+      IF_ID_Inst <= `NOP;
     end else begin
       IF_ID_valid <= 1;
       IF_ID_PC <= PC_out;
       IF_ID_Inst <= inst_in;
     end
   end
+
 
   // 从 IF/ID 寄存器里面取指令
   assign iimm_shamt = IF_ID_Inst[24:20];
@@ -190,7 +196,7 @@ module SCPU (
   );
 
   reg [31:0] True_PC_for_next;
-  reg [ 2:0] True_NPCOp;
+  reg [2:0] True_NPCOp;
 
   // 用 case 替代三目运算符，解决 xxx 问题
   // // True_PC_for_next 在 EX 阶段准备好, 同理 NPC; 在 MEM 阶段写入新的正确的 PC
@@ -218,7 +224,21 @@ module SCPU (
     endcase
   end
 
-  wire[31:0] jalr_next = RD1 + immout;
+  wire [31:0] jalr_next = RD1 + immout;
+
+
+  always @* begin
+    case (NPCOp)
+      `NPC_JALR: IF_Flush = 1'b1;
+      `NPC_JUMP: IF_Flush = 1'b1;
+      `NPC_BRANCH: begin
+        if (Can_Branch == 1) IF_Flush = 1'b1;
+        else IF_Flush = 1'b0;
+      end
+      default: IF_Flush = 1'b0;
+    endcase
+  end
+
 
   NPC U_NPC (
       .PC(True_PC_for_next),
@@ -286,6 +306,10 @@ module SCPU (
       default:        WD = 32'hffffffff;
     endcase
   end
+
+  Forward_unit U_Forward_unit(
+
+  );
 
 
 
