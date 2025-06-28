@@ -52,7 +52,10 @@ module SCPU (
   wire [31:0] aluout;
   assign B = (ALUSrc) ? immout : RD2;
 
-  wire Stall;
+  wire [1:0] Stall;
+
+  wire Stall_ID = Stall[0];
+  wire Stall_EX = Stall[1];
 
 
   // IF/ID
@@ -109,6 +112,12 @@ module SCPU (
       ID_EX_NPCOp <= `NPC_PLUS4;  // 初始化为默认值
       ID_EX_PC <= 0;
     end 
+    // ID 阶段没准备好的 Stall
+    else if(Stall_ID) begin
+      ID_EX_Inst <= `NOP;
+      ID_EX_PC <= 32'hffffffff;
+      ID_EX_NPCOp <= `NPC_PLUS4;  // 初始化为默认值
+    end
     else begin // 否则保持原样
       ID_EX_Inst <= IF_ID_Inst;
       ID_EX_valid <= IF_ID_valid;
@@ -140,7 +149,8 @@ module SCPU (
   reg [2:0] EX_MEM_DMType;
   always @(posedge clk) begin
     if (reset) EX_MEM_valid <= 0;
-    else if(Stall) begin
+    // EX 阶段没准备好的 Stall
+    else if(Stall_EX) begin
       EX_MEM_Inst <= `NOP;
       EX_MEM_PC <= 32'hffffffff;
     end else begin
