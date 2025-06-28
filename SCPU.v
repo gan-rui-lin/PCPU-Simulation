@@ -67,12 +67,12 @@ module SCPU (
     if (reset) begin
       IF_ID_valid <= 0;
     // 被 flush 掉了!
-    end else if (IF_Flush && (Stall == 0)) begin
-      IF_ID_PC   <= 32'hffffffff;  // not used
-      IF_ID_Inst <= `NOP;
     end else if (Stall) begin
       IF_ID_PC   <= IF_ID_PC;
       IF_ID_Inst <= IF_ID_Inst;
+    end else if (IF_Flush) begin
+      IF_ID_PC   <= 32'hffffffff;  // not used
+      IF_ID_Inst <= `NOP;
     end else begin
       IF_ID_valid <= 1;
       IF_ID_PC <= PC_out;
@@ -351,7 +351,9 @@ module SCPU (
       .rs1(rs1),
       .rs2(rs2),
       .ForwardA(ForwardA),
-      .ForwardB(ForwardB)
+      .ForwardB(ForwardB),
+      .EX_MEM_MemRead(EX_MEM_MemRead),
+      .MEM_WB_MemRead (MEM_WB_MemRead)
   );
 
   Hazard_detection U_Hazard_Detection (
