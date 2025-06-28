@@ -224,7 +224,8 @@ module SCPU (
     endcase
   end
 
-  wire [31:0] jalr_next = RD1 + immout;
+  reg  [31:0] RD1_For_Jalr;
+  wire [31:0] jalr_next = RD1_For_Jalr + immout;
 
 
   always @* begin
@@ -235,7 +236,7 @@ module SCPU (
         if (Can_Branch == 1) IF_Flush = 1'b1;
         else IF_Flush = 1'b0;
       end
-      default: IF_Flush = 1'b0;
+      default:   IF_Flush = 1'b0;
     endcase
   end
 
@@ -244,7 +245,7 @@ module SCPU (
       .PC(True_PC_for_next),
       .NPCOp(True_NPCOp),
       .IMM(immout),
-      .aluout(jalr_next),
+      .aluout(jalr_next),  // TO BE MODIFIED
       .NPC(NPC)
   );
   EXT U_EXT (
@@ -273,8 +274,8 @@ module SCPU (
   );
 
   wire [31:0] alu_B = (ID_EX_ALUSrc) ? ID_EX_Imm : ID_EX_RD2;
-  reg [31:0] ALU_A;
-  reg [31:0] ALU_B;
+  reg  [31:0] ALU_A;
+  reg  [31:0] ALU_B;
   alu U_alu (
       .A(ALU_A),
       .B(ALU_B),
@@ -284,11 +285,13 @@ module SCPU (
       .PC(ID_EX_PC)
   );
 
+  reg  [31:0] ALU_A_Btype;
+  reg  [31:0] ALU_B_Btype;
   wire [31:0] alu_B_ID = (ALUSrc) ? immout : RD2;
   wire [31:0] not_used;
   alu U_alu_Btype (
-      .A(RD1),
-      .B(alu_B_ID),
+      .A(ALU_A_Btype),
+      .B(ALU_B_Btype),
       .ALUOp(ALUOp),
       .C(not_used),
       .Zero(Can_Branch),
@@ -309,33 +312,63 @@ module SCPU (
     endcase
   end
 
-  wire [1:0] ForwardA;
-  wire [1:0] ForwardB;
+  wire [3:0] ForwardA;
+  wire [3:0] ForwardB;
 
-  Forward_unit U_Forward_unit(
-    .ID_EX_rs1(ID_EX_rs1),
-    .ID_EX_rs2(ID_EX_rs2),
-    .EX_MEM_rd(EX_MEM_rd),
-    .MEM_WB_rd(MEM_WB_rd),
-    .EX_MEM_RegWrite(EX_MEM_RegWrite),
-    .MEM_WB_RegWrite(MEM_WB_RegWrite),
-    .ForwardA(ForwardA),
-    .ForwardB(ForwardB)
+  Forward_unit U_Forward_unit (
+      .ID_EX_rs1(ID_EX_rs1),
+      .ID_EX_rs2(ID_EX_rs2),
+      .EX_MEM_rd(EX_MEM_rd),
+      .MEM_WB_rd(MEM_WB_rd),
+      .EX_MEM_RegWrite(EX_MEM_RegWrite),
+      .MEM_WB_RegWrite(MEM_WB_RegWrite),
+      .NPCOp(NPCOp),
+      .rs1(rs1),
+      .rs2(rs2),
+      .ForwardA(ForwardA),
+      .ForwardB(ForwardB)
   );
 
-  // Forward = {EX_MEM, MEM_WB}
+  // Forward = {ID_EX, ID_MEM, EX_MEM, MEM_WB}
   always @(*) begin
-    case (ForwardA)
+    case (ForwardA[1:0])
       2'b00: ALU_A <= ID_EX_RD1;
       2'b01: ALU_A <= MEM_WB_ALUResult;
       2'b10: ALU_A <= EX_MEM_ALUResult;
       default ALU_A <= ID_EX_RD1;
     endcase
-    case (ForwardB)
+    case (ForwardB[1:0])
       2'b00: ALU_B <= alu_B;
       2'b01: ALU_B <= MEM_WB_ALUResult;
       2'b10: ALU_B <= EX_MEM_ALUResult;
       default ALU_B <= alu_B;
+    endcase
+  end
+
+  // 前递给 小ALU 做分支判断, 前递给 jalr 得到跳转地址
+  always @(*) begin
+    case (ForwardA[3:2])
+      2'b00:   ALU_A_Btype = RD1;
+      2'b01:   ALU_A_Btype = MEM_WB_ALUResult;
+      2'b10:   ALU_A_Btype = EX_MEM_ALUResult;
+      default: ALU_A_Btype = RD1;
+    endcase
+
+    case (ForwardB[3:2])
+      2'b00:   ALU_B_Btype = alu_B_ID;
+      2'b01:   ALU_B_Btype = MEM_WB_ALUResult;
+      2'b10:   ALU_B_Btype = EX_MEM_ALUResult;
+      default: ALU_B_Btype = alu_B_ID;
+    endcase
+  end
+
+  // 只有 rs1
+  always @(*) begin
+    case (ForwardA[3:2])
+      2'b00:   RD1_For_Jalr = RD1;
+      2'b01:   RD1_For_Jalr = MEM_WB_ALUResult;
+      2'b10:   RD1_For_Jalr = EX_MEM_ALUResult;
+      default: RD1_For_Jalr = RD1;
     endcase
   end
 
