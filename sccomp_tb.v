@@ -23,7 +23,9 @@ module sccomp_tb ();
     // $readmemh("sim5.dat", U_SCCOMP.U_IM.ROM, 0, 26);  // load instructions into instruction memory
     // $readmemh("sim6.dat", U_SCCOMP.U_IM.ROM, 0, 
     // 192);
-      $readmemh("sim2_f.dat", U_SCCOMP.U_IM.ROM, 0, 23);
+      // $readmemh("sim1.dat", U_SCCOMP.U_IM.ROM, 0, 30);
+      // $readmemh("sim2_f.dat", U_SCCOMP.U_IM.ROM, 0, 23);
+      $readmemh("hhh.dat", U_SCCOMP.U_IM.ROM, 0, 2);
     // $monitor("PC = 0x%8X, instr = 0x%8X", U_SCCOMP.PC, U_SCCOMP.instr); // used for debug
     foutput = $fopen("results.txt");
     debug_output = $fopen("debug.txt");
