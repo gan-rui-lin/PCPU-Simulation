@@ -140,7 +140,10 @@ module SCPU (
   reg [2:0] EX_MEM_DMType;
   always @(posedge clk) begin
     if (reset) EX_MEM_valid <= 0;
-    else begin
+    else if(Stall) begin
+      EX_MEM_Inst <= `NOP;
+      EX_MEM_PC <= 32'hffffffff;
+    end else begin
       EX_MEM_Inst <= ID_EX_Inst;
       EX_MEM_valid <= ID_EX_valid;
       EX_MEM_PC <= ID_EX_PC;  // 最终到 MEM_WB_PC
@@ -348,7 +351,8 @@ module SCPU (
       .rs2           (rs2),
       .ID_EX_rd      (ID_EX_rd),
       .EX_MEM_rd     (EX_MEM_rd),
-      .Stall         (Stall)
+      .Stall         (Stall),
+      .NPCOp(NPCOp)
   );
 
 

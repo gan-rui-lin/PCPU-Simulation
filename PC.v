@@ -14,6 +14,6 @@ module PC (
 
   always @(posedge clk, posedge rst)
     if (rst) PC <= 32'h0000_0000;
-    else if (~Stall) PC <= NPC;
+    else if (Stall === 1'bx || ~Stall) PC <= NPC;
 endmodule
 
