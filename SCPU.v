@@ -273,9 +273,11 @@ module SCPU (
   );
 
   wire [31:0] alu_B = (ID_EX_ALUSrc) ? ID_EX_Imm : ID_EX_RD2;
+  reg [31:0] ALU_A;
+  reg [31:0] ALU_B;
   alu U_alu (
-      .A(ID_EX_RD1),
-      .B(alu_B),
+      .A(ALU_A),
+      .B(ALU_B),
       .ALUOp(ID_EX_ALUOp),
       .C(aluout),
       .Zero(Zero),
@@ -283,7 +285,7 @@ module SCPU (
   );
 
   wire [31:0] alu_B_ID = (ALUSrc) ? immout : RD2;
-  wire not_used;
+  wire [31:0] not_used;
   alu U_alu_Btype (
       .A(RD1),
       .B(alu_B_ID),
@@ -307,9 +309,35 @@ module SCPU (
     endcase
   end
 
-  Forward_unit U_Forward_unit(
+  wire [1:0] ForwardA;
+  wire [1:0] ForwardB;
 
+  Forward_unit U_Forward_unit(
+    .ID_EX_rs1(ID_EX_rs1),
+    .ID_EX_rs2(ID_EX_rs2),
+    .EX_MEM_rd(EX_MEM_rd),
+    .MEM_WB_rd(MEM_WB_rd),
+    .EX_MEM_RegWrite(EX_MEM_RegWrite),
+    .MEM_WB_RegWrite(MEM_WB_RegWrite),
+    .ForwardA(ForwardA),
+    .ForwardB(ForwardB)
   );
+
+  // Forward = {EX_MEM, MEM_WB}
+  always @(*) begin
+    case (ForwardA)
+      2'b00: ALU_A <= ID_EX_RD1;
+      2'b01: ALU_A <= MEM_WB_ALUResult;
+      2'b10: ALU_A <= EX_MEM_ALUResult;
+      default ALU_A <= ID_EX_RD1;
+    endcase
+    case (ForwardB)
+      2'b00: ALU_B <= alu_B;
+      2'b01: ALU_B <= MEM_WB_ALUResult;
+      2'b10: ALU_B <= EX_MEM_ALUResult;
+      default ALU_B <= alu_B;
+    endcase
+  end
 
 
 
