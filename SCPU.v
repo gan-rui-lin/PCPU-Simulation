@@ -66,7 +66,8 @@ module SCPU (
   always @(posedge clk) begin
     if (reset) begin
       IF_ID_valid <= 0;
-    end else if (IF_Flush) begin
+    // 被 flush 掉了!
+    end else if (IF_Flush && (Stall == 0)) begin
       IF_ID_PC   <= 32'hffffffff;  // not used
       IF_ID_Inst <= `NOP;
     end else if (Stall) begin
