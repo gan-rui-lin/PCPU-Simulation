@@ -14,7 +14,8 @@ module ctrl (
     ALUSrc,
     GPRSel,
     WDSel,
-    DMType
+    DMType,
+    MemRead
 );
 
   input [6:0] Op;  // opcode
@@ -31,6 +32,7 @@ module ctrl (
   output [2:0] DMType;
   output [1:0] GPRSel;  // general purpose register selection
   output [1:0] WDSel;  // (register) write data selection
+  output MemRead;
 
   wire is_rtype = (Op == 7'b0110011);
   wire is_itype_l = (Op == 7'b0000011);  // load
@@ -151,5 +153,7 @@ module ctrl (
   assign DMType[0] = is_lh | is_sh | is_sb | is_lb;
   assign DMType[1] = is_lhu | is_sb | is_lb;
   assign DMType[2] = is_lbu;
+
+  assign MemRead = is_itype_l;
 
 endmodule

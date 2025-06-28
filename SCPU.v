@@ -16,6 +16,7 @@ module SCPU (
     output [ 2:0] DMType_out
 );
   wire        MemWrite;
+  wire        MemRead;
   wire        RegWrite;  // control signal to register write
   wire [ 5:0] EXTOp;  // control signal to signed extension
   wire [ 4:0] ALUOp;  // ALU opertion
@@ -51,11 +52,13 @@ module SCPU (
   wire [31:0] aluout;
   assign B = (ALUSrc) ? immout : RD2;
 
+  wire Stall;
+
 
   // IF/ID
   // 考虑 beq 跳转成功(ID 阶段判断) flush 掉 IF 阶段的指令
-  reg IF_ID_valid;
-  reg IF_Flush;
+  reg  IF_ID_valid;
+  reg  IF_Flush;
   reg [31:0] IF_ID_PC, IF_ID_Inst;
   always @(posedge clk) begin
     if (reset) begin
@@ -63,6 +66,9 @@ module SCPU (
     end else if (IF_Flush) begin
       IF_ID_PC   <= 32'hffffffff;  // not used
       IF_ID_Inst <= `NOP;
+    end else if (Stall) begin
+      IF_ID_PC   <= IF_ID_PC;
+      IF_ID_Inst <= IF_ID_Inst;
     end else begin
       IF_ID_valid <= 1;
       IF_ID_PC <= PC_out;
@@ -94,7 +100,7 @@ module SCPU (
   reg [4:0] ID_EX_rs1, ID_EX_rs2, ID_EX_rd;
   reg [4:0] ID_EX_ALUOp;
   reg [2:0] ID_EX_NPCOp;
-  reg ID_EX_ALUSrc, ID_EX_RegWrite, ID_EX_MemWrite;
+  reg ID_EX_ALUSrc, ID_EX_RegWrite, ID_EX_MemWrite, ID_EX_MemRead;
   reg [1:0] ID_EX_WDSel;
   reg [2:0] ID_EX_DMType;
   always @(posedge clk) begin
@@ -102,7 +108,8 @@ module SCPU (
       ID_EX_valid <= 0;
       ID_EX_NPCOp <= `NPC_PLUS4;  // 初始化为默认值
       ID_EX_PC <= 0;
-    end else begin
+    end 
+    else begin // 否则保持原样
       ID_EX_Inst <= IF_ID_Inst;
       ID_EX_valid <= IF_ID_valid;
       ID_EX_PC <= IF_ID_PC;  // 往后传就是了
@@ -119,6 +126,7 @@ module SCPU (
       ID_EX_DMType <= DMType;
       ID_EX_MemWrite <= MemWrite;
       ID_EX_NPCOp <= NPCOp;
+      ID_EX_MemRead <= MemRead;
     end
   end
 
@@ -126,7 +134,7 @@ module SCPU (
   reg EX_MEM_valid;
   reg [31:0] EX_MEM_ALUResult, EX_MEM_RD2, EX_MEM_PC, EX_MEM_Inst;
   reg [4:0] EX_MEM_rd;
-  reg EX_MEM_RegWrite, EX_MEM_MemWrite;
+  reg EX_MEM_RegWrite, EX_MEM_MemWrite, EX_MEM_MemRead;
   reg [2:0] EX_MEM_NPCOp;
   reg [1:0] EX_MEM_WDSel;
   reg [2:0] EX_MEM_DMType;
@@ -144,6 +152,7 @@ module SCPU (
       EX_MEM_MemWrite <= ID_EX_MemWrite;
       EX_MEM_WDSel <= ID_EX_WDSel;
       EX_MEM_DMType <= ID_EX_DMType;
+      EX_MEM_MemRead <= ID_EX_MemRead;
     end
   end
 
@@ -185,14 +194,16 @@ module SCPU (
       .ALUSrc(ALUSrc),
       .GPRSel(GPRSel),
       .WDSel(WDSel),
-      .DMType(DMType)
+      .DMType(DMType),
+      .MemRead(MemRead)
   );
 
   PC U_PC (
       .clk(clk),
       .rst(reset),
       .NPC(NPC),
-      .PC (PC_out)
+      .PC(PC_out),
+      .Stall(Stall)
   );
 
   reg [31:0] True_PC_for_next;
@@ -328,6 +339,18 @@ module SCPU (
       .ForwardA(ForwardA),
       .ForwardB(ForwardB)
   );
+
+  Hazard_detection U_Hazard_Detection (
+      .ID_EX_MemRead (ID_EX_MemRead),
+      .EX_MEM_MemRead(EX_MEM_MemRead),
+      .ID_EX_RegWrite(ID_EX_RegWrite),
+      .rs1           (rs1),
+      .rs2           (rs2),
+      .ID_EX_rd      (ID_EX_rd),
+      .EX_MEM_rd     (EX_MEM_rd),
+      .Stall         (Stall)
+  );
+
 
   // Forward = {ID_EX, ID_MEM, EX_MEM, MEM_WB}
   always @(*) begin
