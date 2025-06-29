@@ -203,6 +203,7 @@ module SCPU (
       MEM_WB_RegWrite <= EX_MEM_RegWrite;
       MEM_WB_WDSel <= EX_MEM_WDSel;
       MEM_WB_MemWrite <= EX_MEM_MemWrite;
+      MEM_WB_MemRead <= EX_MEM_MemRead;
     end
   end
 
@@ -345,7 +346,6 @@ module SCPU (
 
   // 在 MEM 阶段传递地址、待写数据(下周期真正写) 给DM 模块, WB 阶段读出 Data_in 准备写回寄存器(下周期写);
   assign Addr_out = EX_MEM_ALUResult; // 传给外层的 sccomp
-  // Data_in 也要前递出去才行
   assign Data_out = EX_MEM_RD2;     // 传给外层的 sccomp
   assign mem_w = EX_MEM_MemWrite;   // 传给外层的 sccomp
   assign DMType_out = EX_MEM_DMType;
@@ -413,14 +413,14 @@ module SCPU (
   always @(*) begin
     case (ForwardA[3:2])
       2'b00:   ALU_A_Btype = RD1;
-      2'b01:   ALU_A_Btype = WD;
+      2'b01:   ALU_A_Btype = MEM_WB_MemData;
       2'b10:   ALU_A_Btype = EX_MEM_ALUResult;
       default: ALU_A_Btype = RD1;
     endcase
 
     case (ForwardB[3:2])
       2'b00:   ALU_RD2_Btype = RD2;
-      2'b01:   ALU_RD2_Btype = WD;
+      2'b01:   ALU_RD2_Btype = MEM_WB_MemData;
       2'b10:   ALU_RD2_Btype = EX_MEM_ALUResult;
       default: ALU_RD2_Btype = RD2;
     endcase
