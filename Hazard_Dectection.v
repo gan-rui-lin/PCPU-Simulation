@@ -19,11 +19,13 @@ module Hazard_detection (
       if (ID_EX_MemRead && ((ID_EX_rd == rs1) || (ID_EX_rd == rs2))) begin
         Stall= 1'b1;
       end
+      // Addi Jalr/B
       if ((NPCOp == `NPC_BRANCH || NPCOp == `NPC_JALR) && ID_EX_RegWrite && ((ID_EX_rd == rs1) || (ID_EX_rd == rs2))) begin
         Stall = 1'b1;
       end
     end 
-    else if (EX_MEM_rd != 5'd0) begin
+    if (EX_MEM_rd != 5'd0) begin
+      // load-use 型的第二次停顿
       if (EX_MEM_MemRead && ((EX_MEM_rd == rs1) || (EX_MEM_rd == rs2))) begin
         Stall = 1'b1;
       end
