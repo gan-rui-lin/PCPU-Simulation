@@ -16,23 +16,30 @@ module Forward_unit (
     output [3:0] ForwardB
 );
 
-  wire EX_MEM_ForwardA = (EX_MEM_rd != 0) && (EX_MEM_rd == ID_EX_rs1) && EX_MEM_RegWrite;
-  wire MEM_WB_ForwardA = (MEM_WB_rd != 0) && (MEM_WB_rd == ID_EX_rs1) && MEM_WB_RegWrite && !EX_MEM_ForwardA;
+  // 送出 ALUOut(上一条一定是 RegWrite 指令, 不能是 lw 指令, 不然送的不对)
+  wire EX_MEM_ForwardA = (EX_MEM_rd != 0) && (EX_MEM_rd == ID_EX_rs1) && EX_MEM_RegWrite && (!EX_MEM_MemRead);
+
+  // 送出 WD(可能是 ALUOut 或者 MemData)
+  // RegWrite -> ALUOut / (PC + 4)
+  // MemRead  -> WD 对应 内存数据
+  wire MEM_WB_ForwardA = (MEM_WB_rd != 0) && (MEM_WB_rd == ID_EX_rs1) && (MEM_WB_RegWrite || MEM_WB_MemRead) && !EX_MEM_ForwardA;
 
   // 跳转指令需要的前递(ID判断分支条件是否成立), 如 beq, jal, jalr
 
-  // 关键问题是：
-  // Addi xxx beq; lw xxx beq 需要不同处理; 一个是送 ALUOut 一个送 WD
-  // Forward_unit 只处理了前一种情况
   wire ID_EX_ForwardA = (EX_MEM_rd != 0) && (EX_MEM_rd == rs1) && (EX_MEM_RegWrite) && (!EX_MEM_MemRead) && (NPCOp == `NPC_BRANCH || NPCOp == `NPC_JALR || NPCOp == `NPC_JUMP);
-// 需要防止被 Load-Jalr 误用(Load 指令而言，ALUOut 的值是 IMM, 必须阻塞到 WB 阶段)
-  wire ID_MEM_ForwardA = (MEM_WB_rd != 0) && (MEM_WB_rd == rs1) && (MEM_WB_RegWrite) && (!MEM_WB_MemRead) && (NPCOp == `NPC_BRANCH || NPCOp == `NPC_JALR || NPCOp == `NPC_JUMP) && !ID_EX_ForwardA;
+
+  // 送出 WD(可能是 ALUOut 或者 MemData)
+  wire ID_MEM_ForwardA = (MEM_WB_rd != 0) && (MEM_WB_rd == rs1) && (MEM_WB_RegWrite || MEM_WB_MemRead) && (NPCOp == `NPC_BRANCH || NPCOp == `NPC_JALR || NPCOp == `NPC_JUMP) && !ID_EX_ForwardA;
 
   wire EX_MEM_ForwardB = (EX_MEM_rd != 0) && (EX_MEM_rd == ID_EX_rs2) && EX_MEM_RegWrite;
-  wire MEM_WB_ForwardB = (MEM_WB_rd != 0) && (MEM_WB_rd == ID_EX_rs2) && MEM_WB_RegWrite && !EX_MEM_ForwardB;
+
+  // 送出 WD(可能是 ALUOut 或者 MemData)
+  wire MEM_WB_ForwardB = (MEM_WB_rd != 0) && (MEM_WB_rd == ID_EX_rs2) && (MEM_WB_RegWrite || MEM_WB_MemRead) && !EX_MEM_ForwardB;
 
   wire ID_EX_ForwardB = (EX_MEM_rd != 0) && (EX_MEM_rd == rs2) && (EX_MEM_RegWrite) && (!EX_MEM_MemRead) && (NPCOp == `NPC_BRANCH || NPCOp == `NPC_JALR || NPCOp == `NPC_JUMP);
-  wire ID_MEM_ForwardB = (MEM_WB_rd != 0) && (MEM_WB_rd == rs2) && (MEM_WB_RegWrite) && (!MEM_WB_MemRead) && (NPCOp == `NPC_BRANCH || NPCOp == `NPC_JALR || NPCOp == `NPC_JUMP) && !ID_EX_ForwardB;
+
+  // 送出 WD(可能是 ALUOut 或者 MemData)
+  wire ID_MEM_ForwardB = (MEM_WB_rd != 0) && (MEM_WB_rd == rs2) && (MEM_WB_RegWrite || MEM_WB_MemRead) && (NPCOp == `NPC_BRANCH || NPCOp == `NPC_JALR || NPCOp == `NPC_JUMP) && !ID_EX_ForwardB;
 
   // 优先 forward EX_MEM 旁路的值 
   assign ForwardA = {ID_EX_ForwardA, ID_MEM_ForwardA, EX_MEM_ForwardA, MEM_WB_ForwardA};
