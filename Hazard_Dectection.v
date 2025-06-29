@@ -24,7 +24,8 @@ module Hazard_detection (
         Stall = 1'b1;
       end
     end 
-    if (EX_MEM_rd != 5'd0) begin
+    // 这里是 if 就会让 Stall 由 1 到 0
+    else if (EX_MEM_rd != 5'd0) begin
       // load-use 型的第二次停顿
       if (EX_MEM_MemRead && ((EX_MEM_rd == rs1) || (EX_MEM_rd == rs2))) begin
         Stall = 1'b1;
