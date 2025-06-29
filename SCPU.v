@@ -53,10 +53,7 @@ module SCPU (
   wire [31:0] aluout;
   assign B = (ALUSrc) ? immout : RD2;
 
-  wire [1:0] Stall;
-
-  wire Stall_ID = Stall[0];
-  wire Stall_EX = Stall[1];
+  wire Stall;
 
   reg [31:0] ALU_A;  // 前递后真正输入 ALU 的信号
   reg [31:0] ALU_B;
@@ -122,10 +119,16 @@ module SCPU (
 
 
 
-    else if (Stall_ID) begin
+    else if (Stall) begin
       ID_EX_Inst <= `NOP;
       ID_EX_PC <= 32'hffffffff;
+      // 清除控制信号
       ID_EX_NPCOp <= `NPC_PLUS4;  // 初始化为默认值
+      ID_EX_MemRead <= 0;
+      ID_EX_ALUOp <= 0;
+      ID_EX_RegWrite <= 0;
+      ID_EX_DMType <= 0;
+      ID_EX_MemWrite <= 0;
     end else begin  // 否则保持原样
       ID_EX_Inst <= IF_ID_Inst;
       ID_EX_valid <= IF_ID_valid;
@@ -160,7 +163,7 @@ module SCPU (
   always @(posedge clk) begin
     if (reset) EX_MEM_valid <= 0;
     // EX 阶段没准备好的 Stall
-    else if (Stall_EX) begin
+    else if (0) begin
       EX_MEM_Inst <= `NOP;
       EX_MEM_PC   <= 32'hffffffff;
     end else begin
