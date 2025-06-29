@@ -407,14 +407,14 @@ module SCPU (
   always @(*) begin
     case (ForwardA[3:2])
       2'b00:   ALU_A_Btype = RD1;
-      2'b01:   ALU_A_Btype = MEM_WB_ALUResult;
+      2'b01:   ALU_A_Btype = WD;
       2'b10:   ALU_A_Btype = EX_MEM_ALUResult;
       default: ALU_A_Btype = RD1;
     endcase
 
     case (ForwardB[3:2])
       2'b00:   ALU_B_Btype = alu_B_ID;
-      2'b01:   ALU_B_Btype = MEM_WB_ALUResult;
+      2'b01:   ALU_B_Btype = WD;
       2'b10:   ALU_B_Btype = EX_MEM_ALUResult;
       default: ALU_B_Btype = alu_B_ID;
     endcase
@@ -424,7 +424,7 @@ module SCPU (
   always @(*) begin
     case (ForwardA[3:2])
       2'b00:   RD1_For_Jalr = RD1;
-      2'b01:   RD1_For_Jalr = MEM_WB_ALUResult;
+      2'b01:   RD1_For_Jalr = WD;
       2'b10:   RD1_For_Jalr = EX_MEM_ALUResult;
       default: RD1_For_Jalr = RD1;
     endcase

@@ -1,0 +1,620 @@
+Cycle 1
+----- Actual In and Out -----
+PC_out = 00000000, inst_in = 00500293
+Data_in = xxxxxxxx, mem_w = x
+Addr_out = xxxxxxxx, Data_out = xxxxxxxx
+reg_sel =  x, reg_data = xxxxxxxx
+DMType_out = x
+MemRead_out = x
+----- IF/ID -----
+valid = 1, PC = xxxxxxxx, Inst = xxxxxxxx
+----- ID/EX -----
+valid = x, PC = xxxxxxxx, RD1 = xxxxxxxx, RD2 = xxxxxxxx, Imm = xxxxxxxx
+rs1 =  x, rs2 =  x, rd =  x, ALUOp = xx, ALUSrc = x, RegWrite = x, WDSel = xx, DMType = x, MemWrite = x
+----- EX/MEM -----
+valid = x, PC = xxxxxxxx, ALUResult = xxxxxxxx, RD2 = xxxxxxxx, rd =  x
+RegWrite = x, MemWrite = x, WDSel = xx, DMType = x, MemRead = x
+----- MEM/WB -----
+valid = x, PC = xxxxxxxx, MemData = xxxxxxxx, ALUResult = xxxxxxxx, rd =  x
+RegWrite = x, WDSel = xx
+
+Cycle 2
+----- Actual In and Out -----
+PC_out = 00000004, inst_in = 00502023
+Data_in = xxxxxxxx, mem_w = x
+Addr_out = xxxxxxxx, Data_out = xxxxxxxx
+reg_sel =  x, reg_data = xxxxxxxx
+DMType_out = x
+MemRead_out = x
+----- IF/ID -----
+valid = 1, PC = 00000000, Inst = 00500293
+----- ID/EX -----
+valid = 1, PC = xxxxxxxx, RD1 = xxxxxxxx, RD2 = xxxxxxxx, Imm = xxxxxxxx
+rs1 =  x, rs2 =  x, rd =  x, ALUOp = xx, ALUSrc = x, RegWrite = x, WDSel = xx, DMType = x, MemWrite = x
+----- EX/MEM -----
+valid = x, PC = xxxxxxxx, ALUResult = xxxxxxxx, RD2 = xxxxxxxx, rd =  x
+RegWrite = x, MemWrite = x, WDSel = xx, DMType = x, MemRead = x
+----- MEM/WB -----
+valid = x, PC = xxxxxxxx, MemData = xxxxxxxx, ALUResult = xxxxxxxx, rd =  x
+RegWrite = x, WDSel = xx
+
+Cycle 3
+----- Actual In and Out -----
+PC_out = 00000008, inst_in = 00002303
+Data_in = xxxxxxxx, mem_w = x
+Addr_out = xxxxxxxx, Data_out = xxxxxxxx
+reg_sel =  x, reg_data = xxxxxxxx
+DMType_out = x
+MemRead_out = x
+----- IF/ID -----
+valid = 1, PC = 00000004, Inst = 00502023
+----- ID/EX -----
+valid = 1, PC = 00000000, RD1 = 00000000, RD2 = 00000000, Imm = 00000005
+rs1 =  0, rs2 =  5, rd =  5, ALUOp = 03, ALUSrc = 1, RegWrite = 1, WDSel = 00, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = xxxxxxxx, ALUResult = xxxxxxxx, RD2 = xxxxxxxx, rd =  x
+RegWrite = x, MemWrite = x, WDSel = xx, DMType = x, MemRead = x
+----- MEM/WB -----
+valid = x, PC = xxxxxxxx, MemData = xxxxxxxx, ALUResult = xxxxxxxx, rd =  x
+RegWrite = x, WDSel = xx
+
+Cycle 4
+----- Actual In and Out -----
+PC_out = 0000000c, inst_in = 00230393
+Data_in = 12345678, mem_w = 0
+Addr_out = 00000005, Data_out = 00000000
+reg_sel =  x, reg_data = xxxxxxxx
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = 00000008, Inst = 00002303
+----- ID/EX -----
+valid = 1, PC = 00000004, RD1 = 00000000, RD2 = 00000000, Imm = 00000000
+rs1 =  0, rs2 =  5, rd =  0, ALUOp = 03, ALUSrc = 1, RegWrite = 0, WDSel = 00, DMType = 0, MemWrite = 1
+----- EX/MEM -----
+valid = 1, PC = 00000000, ALUResult = 00000005, RD2 = 00000000, rd =  5
+RegWrite = 1, MemWrite = 0, WDSel = 00, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = xxxxxxxx, MemData = xxxxxxxx, ALUResult = xxxxxxxx, rd =  x
+RegWrite = x, WDSel = xx
+
+Cycle 5
+----- Actual In and Out -----
+PC_out = 00000010, inst_in = 00700413
+Data_in = 12345678, mem_w = 1
+Addr_out = 00000000, Data_out = 00000005
+reg_sel =  x, reg_data = xxxxxxxx
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = 0000000c, Inst = 00230393
+----- ID/EX -----
+valid = 1, PC = 00000008, RD1 = 00000000, RD2 = 00000000, Imm = 00000000
+rs1 =  0, rs2 =  0, rd =  6, ALUOp = 03, ALUSrc = 1, RegWrite = 1, WDSel = 01, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = 00000004, ALUResult = 00000000, RD2 = 00000005, rd =  0
+RegWrite = 0, MemWrite = 1, WDSel = 00, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = 00000000, MemData = 12345678, ALUResult = 00000005, rd =  5
+RegWrite = 1, WDSel = 00
+
+Cycle 6
+----- Actual In and Out -----
+PC_out = 00000010, inst_in = 00700413
+Data_in = 00000005, mem_w = 0
+Addr_out = 00000000, Data_out = 00000000
+reg_sel =  x, reg_data = xxxxxxxx
+DMType_out = 0
+MemRead_out = 1
+----- IF/ID -----
+valid = 1, PC = 0000000c, Inst = 00230393
+----- ID/EX -----
+valid = 1, PC = ffffffff, RD1 = 00000000, RD2 = 00000000, Imm = 00000000
+rs1 =  0, rs2 =  0, rd =  6, ALUOp = 00, ALUSrc = 1, RegWrite = 0, WDSel = 01, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = 00000008, ALUResult = 00000000, RD2 = 00000000, rd =  6
+RegWrite = 1, MemWrite = 0, WDSel = 01, DMType = 0, MemRead = 1
+----- MEM/WB -----
+valid = 1, PC = 00000004, MemData = 12345678, ALUResult = 00000000, rd =  0
+RegWrite = 0, WDSel = 00
+
+Cycle 7
+----- Actual In and Out -----
+PC_out = 00000014, inst_in = 00838e63
+Data_in = 12345678, mem_w = 0
+Addr_out = 00000000, Data_out = 00000000
+reg_sel =  x, reg_data = xxxxxxxx
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = 00000010, Inst = 00700413
+----- ID/EX -----
+valid = 1, PC = 0000000c, RD1 = 00000000, RD2 = 00000000, Imm = 00000002
+rs1 =  6, rs2 =  2, rd =  7, ALUOp = 03, ALUSrc = 1, RegWrite = 1, WDSel = 00, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = ffffffff, ALUResult = 00000000, RD2 = 00000000, rd =  6
+RegWrite = 0, MemWrite = 0, WDSel = 01, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = 00000008, MemData = 00000005, ALUResult = 00000000, rd =  6
+RegWrite = 1, WDSel = 01
+
+Cycle 8
+----- Actual In and Out -----
+PC_out = 00000018, inst_in = 00a00513
+Data_in = 12345678, mem_w = 0
+Addr_out = 00000007, Data_out = 00000000
+reg_sel =  x, reg_data = xxxxxxxx
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = 00000014, Inst = 00838e63
+----- ID/EX -----
+valid = 1, PC = 00000010, RD1 = 00000000, RD2 = 00000000, Imm = 00000007
+rs1 =  0, rs2 =  7, rd =  8, ALUOp = 03, ALUSrc = 1, RegWrite = 1, WDSel = 00, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = 0000000c, ALUResult = 00000007, RD2 = 00000000, rd =  7
+RegWrite = 1, MemWrite = 0, WDSel = 00, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = ffffffff, MemData = 12345678, ALUResult = 00000000, rd =  6
+RegWrite = 0, WDSel = 01
+
+Cycle 9
+----- Actual In and Out -----
+PC_out = 00000018, inst_in = 00a00513
+Data_in = 12345678, mem_w = 0
+Addr_out = 00000007, Data_out = 00000007
+reg_sel =  x, reg_data = xxxxxxxx
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = 00000014, Inst = 00838e63
+----- ID/EX -----
+valid = 1, PC = ffffffff, RD1 = 00000000, RD2 = 00000000, Imm = 00000007
+rs1 =  0, rs2 =  7, rd =  8, ALUOp = 00, ALUSrc = 1, RegWrite = 0, WDSel = 00, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = 00000010, ALUResult = 00000007, RD2 = 00000007, rd =  8
+RegWrite = 1, MemWrite = 0, WDSel = 00, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = 0000000c, MemData = 12345678, ALUResult = 00000007, rd =  7
+RegWrite = 1, WDSel = 00
+
+Cycle 10
+----- Actual In and Out -----
+PC_out = 00000030, inst_in = 01c00593
+Data_in = 12345678, mem_w = 0
+Addr_out = 00000000, Data_out = 00000007
+reg_sel =  x, reg_data = xxxxxxxx
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = ffffffff, Inst = 00000013
+----- ID/EX -----
+valid = 1, PC = 00000014, RD1 = 00000007, RD2 = 00000000, Imm = 0000001c
+rs1 =  7, rs2 =  8, rd = 28, ALUOp = 04, ALUSrc = 0, RegWrite = 0, WDSel = 00, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = ffffffff, ALUResult = 00000000, RD2 = 00000007, rd =  8
+RegWrite = 0, MemWrite = 0, WDSel = 00, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = 00000010, MemData = 12345678, ALUResult = 00000007, rd =  8
+RegWrite = 1, WDSel = 00
+
+Cycle 11
+----- Actual In and Out -----
+PC_out = 00000034, inst_in = 00058067
+Data_in = 12345678, mem_w = 0
+Addr_out = 00000000, Data_out = 00000007
+reg_sel =  7, reg_data = 00000007
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = 00000030, Inst = 01c00593
+----- ID/EX -----
+valid = 1, PC = ffffffff, RD1 = 00000000, RD2 = 00000000, Imm = 00000000
+rs1 =  0, rs2 =  0, rd =  0, ALUOp = 03, ALUSrc = 1, RegWrite = 1, WDSel = 00, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = 00000014, ALUResult = 00000000, RD2 = 00000007, rd = 28
+RegWrite = 0, MemWrite = 0, WDSel = 00, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = ffffffff, MemData = 12345678, ALUResult = 00000000, rd =  8
+RegWrite = 0, WDSel = 00
+
+Cycle 12
+----- Actual In and Out -----
+PC_out = 00000038, inst_in = 02800613
+Data_in = 12345678, mem_w = 0
+Addr_out = 00000000, Data_out = 00000000
+reg_sel =  7, reg_data = 00000007
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = 00000034, Inst = 00058067
+----- ID/EX -----
+valid = 1, PC = 00000030, RD1 = 00000000, RD2 = 00000000, Imm = 0000001c
+rs1 =  0, rs2 = 28, rd = 11, ALUOp = 03, ALUSrc = 1, RegWrite = 1, WDSel = 00, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = ffffffff, ALUResult = 00000000, RD2 = 00000000, rd =  0
+RegWrite = 1, MemWrite = 0, WDSel = 00, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = 00000014, MemData = 12345678, ALUResult = 00000000, rd = 28
+RegWrite = 0, WDSel = 00
+
+Cycle 13
+----- Actual In and Out -----
+PC_out = 00000038, inst_in = 02800613
+Data_in = 12345678, mem_w = 0
+Addr_out = 0000001c, Data_out = 00000000
+reg_sel =  7, reg_data = 00000007
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = 00000034, Inst = 00058067
+----- ID/EX -----
+valid = 1, PC = ffffffff, RD1 = 00000000, RD2 = 00000000, Imm = 0000001c
+rs1 =  0, rs2 = 28, rd = 11, ALUOp = 00, ALUSrc = 1, RegWrite = 0, WDSel = 00, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = 00000030, ALUResult = 0000001c, RD2 = 00000000, rd = 11
+RegWrite = 1, MemWrite = 0, WDSel = 00, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = ffffffff, MemData = 12345678, ALUResult = 00000000, rd =  0
+RegWrite = 1, WDSel = 00
+
+Cycle 14
+----- Actual In and Out -----
+PC_out = 0000001c, inst_in = 00002383
+Data_in = 12345678, mem_w = 0
+Addr_out = 00000000, Data_out = 00000000
+reg_sel =  7, reg_data = 00000007
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = ffffffff, Inst = 00000013
+----- ID/EX -----
+valid = 1, PC = 00000034, RD1 = 00000000, RD2 = 00000000, Imm = 00000000
+rs1 = 11, rs2 =  0, rd =  0, ALUOp = 03, ALUSrc = 1, RegWrite = 1, WDSel = 10, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = ffffffff, ALUResult = 00000000, RD2 = 00000000, rd = 11
+RegWrite = 0, MemWrite = 0, WDSel = 00, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = 00000030, MemData = 12345678, ALUResult = 0000001c, rd = 11
+RegWrite = 1, WDSel = 00
+
+Cycle 15
+----- Actual In and Out -----
+PC_out = 00000020, inst_in = 00728c63
+Data_in = 12345678, mem_w = 0
+Addr_out = 0000001c, Data_out = 00000000
+reg_sel =  7, reg_data = 00000007
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = 0000001c, Inst = 00002383
+----- ID/EX -----
+valid = 1, PC = ffffffff, RD1 = 00000000, RD2 = 00000000, Imm = 00000000
+rs1 =  0, rs2 =  0, rd =  0, ALUOp = 03, ALUSrc = 1, RegWrite = 1, WDSel = 00, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = 00000034, ALUResult = 0000001c, RD2 = 00000000, rd =  0
+RegWrite = 1, MemWrite = 0, WDSel = 10, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = ffffffff, MemData = 12345678, ALUResult = 00000000, rd = 11
+RegWrite = 0, WDSel = 00
+
+Cycle 16
+----- Actual In and Out -----
+PC_out = 00000024, inst_in = 00a00513
+Data_in = 12345678, mem_w = 0
+Addr_out = 00000000, Data_out = 00000000
+reg_sel =  7, reg_data = 00000007
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = 00000020, Inst = 00728c63
+----- ID/EX -----
+valid = 1, PC = 0000001c, RD1 = 00000000, RD2 = 00000000, Imm = 00000000
+rs1 =  0, rs2 =  0, rd =  7, ALUOp = 03, ALUSrc = 1, RegWrite = 1, WDSel = 01, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = ffffffff, ALUResult = 00000000, RD2 = 00000000, rd =  0
+RegWrite = 1, MemWrite = 0, WDSel = 00, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = 00000034, MemData = 12345678, ALUResult = 0000001c, rd =  0
+RegWrite = 1, WDSel = 10
+
+Cycle 17
+----- Actual In and Out -----
+PC_out = 00000024, inst_in = 00a00513
+Data_in = 00000005, mem_w = 0
+Addr_out = 00000000, Data_out = 00000000
+reg_sel =  7, reg_data = 00000007
+DMType_out = 0
+MemRead_out = 1
+----- IF/ID -----
+valid = 1, PC = 00000020, Inst = 00728c63
+----- ID/EX -----
+valid = 1, PC = ffffffff, RD1 = 00000000, RD2 = 00000000, Imm = 00000000
+rs1 =  0, rs2 =  0, rd =  7, ALUOp = 00, ALUSrc = 1, RegWrite = 0, WDSel = 01, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = 0000001c, ALUResult = 00000000, RD2 = 00000000, rd =  7
+RegWrite = 1, MemWrite = 0, WDSel = 01, DMType = 0, MemRead = 1
+----- MEM/WB -----
+valid = 1, PC = ffffffff, MemData = 12345678, ALUResult = 00000000, rd =  0
+RegWrite = 1, WDSel = 00
+
+Cycle 18
+----- Actual In and Out -----
+PC_out = 00000028, inst_in = 00100713
+Data_in = 12345678, mem_w = 0
+Addr_out = 00000000, Data_out = 00000000
+reg_sel =  7, reg_data = 00000007
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = 00000024, Inst = 00a00513
+----- ID/EX -----
+valid = 1, PC = 00000020, RD1 = 00000005, RD2 = 00000007, Imm = 00000018
+rs1 =  5, rs2 =  7, rd = 24, ALUOp = 04, ALUSrc = 0, RegWrite = 0, WDSel = 00, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = ffffffff, ALUResult = 00000000, RD2 = 00000000, rd =  7
+RegWrite = 0, MemWrite = 0, WDSel = 01, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = 0000001c, MemData = 00000005, ALUResult = 00000000, rd =  7
+RegWrite = 1, WDSel = 01
+
+Cycle 19
+----- Actual In and Out -----
+PC_out = 0000002c, inst_in = 01c0006f
+Data_in = 12345678, mem_w = 0
+Addr_out = 00000000, Data_out = 00000005
+reg_sel =  7, reg_data = 00000005
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = 00000028, Inst = 00100713
+----- ID/EX -----
+valid = 1, PC = 00000024, RD1 = 00000000, RD2 = 00000000, Imm = 0000000a
+rs1 =  0, rs2 = 10, rd = 10, ALUOp = 03, ALUSrc = 1, RegWrite = 1, WDSel = 00, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = 00000020, ALUResult = 00000000, RD2 = 00000005, rd = 24
+RegWrite = 0, MemWrite = 0, WDSel = 00, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = ffffffff, MemData = 12345678, ALUResult = 00000000, rd =  7
+RegWrite = 0, WDSel = 01
+
+Cycle 20
+----- Actual In and Out -----
+PC_out = 00000030, inst_in = 01c00593
+Data_in = 12345678, mem_w = 0
+Addr_out = 0000000a, Data_out = 00000000
+reg_sel =  7, reg_data = 00000005
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = 0000002c, Inst = 01c0006f
+----- ID/EX -----
+valid = 1, PC = 00000028, RD1 = 00000000, RD2 = 00000000, Imm = 00000001
+rs1 =  0, rs2 =  1, rd = 14, ALUOp = 03, ALUSrc = 1, RegWrite = 1, WDSel = 00, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = 00000024, ALUResult = 0000000a, RD2 = 00000000, rd = 10
+RegWrite = 1, MemWrite = 0, WDSel = 00, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = 00000020, MemData = 12345678, ALUResult = 00000000, rd = 24
+RegWrite = 0, WDSel = 00
+
+Cycle 21
+----- Actual In and Out -----
+PC_out = 00000048, inst_in = 10028293
+Data_in = 12345678, mem_w = 0
+Addr_out = 00000001, Data_out = 00000000
+reg_sel =  7, reg_data = 00000005
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = ffffffff, Inst = 00000013
+----- ID/EX -----
+valid = 1, PC = 0000002c, RD1 = 00000000, RD2 = 00000000, Imm = 0000001c
+rs1 =  0, rs2 = 28, rd =  0, ALUOp = 00, ALUSrc = 1, RegWrite = 1, WDSel = 10, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = 00000028, ALUResult = 00000001, RD2 = 00000000, rd = 14
+RegWrite = 1, MemWrite = 0, WDSel = 00, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = 00000024, MemData = 12345678, ALUResult = 0000000a, rd = 10
+RegWrite = 1, WDSel = 00
+
+Cycle 22
+----- Actual In and Out -----
+PC_out = 0000004c, inst_in = xxxxxxxx
+Data_in = 12345678, mem_w = 0
+Addr_out = 00000000, Data_out = 00000000
+reg_sel =  7, reg_data = 00000005
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = 00000048, Inst = 10028293
+----- ID/EX -----
+valid = 1, PC = ffffffff, RD1 = 00000000, RD2 = 00000000, Imm = 00000000
+rs1 =  0, rs2 =  0, rd =  0, ALUOp = 03, ALUSrc = 1, RegWrite = 1, WDSel = 00, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = 0000002c, ALUResult = 00000000, RD2 = 00000000, rd =  0
+RegWrite = 1, MemWrite = 0, WDSel = 10, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = 00000028, MemData = 12345678, ALUResult = 00000001, rd = 14
+RegWrite = 1, WDSel = 00
+
+Cycle 23
+----- Actual In and Out -----
+PC_out = 00000050, inst_in = xxxxxxxx
+Data_in = 12345678, mem_w = 0
+Addr_out = 00000000, Data_out = 00000000
+reg_sel =  7, reg_data = 00000005
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = 0000004c, Inst = xxxxxxxx
+----- ID/EX -----
+valid = 1, PC = 00000048, RD1 = 00000005, RD2 = 00000000, Imm = 00000100
+rs1 =  5, rs2 =  0, rd =  5, ALUOp = 03, ALUSrc = 1, RegWrite = 1, WDSel = 00, DMType = 0, MemWrite = 0
+----- EX/MEM -----
+valid = 1, PC = ffffffff, ALUResult = 00000000, RD2 = 00000000, rd =  0
+RegWrite = 1, MemWrite = 0, WDSel = 00, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = 0000002c, MemData = 12345678, ALUResult = 00000000, rd =  0
+RegWrite = 1, WDSel = 10
+
+Cycle 24
+----- Actual In and Out -----
+PC_out = 00000054, inst_in = xxxxxxxx
+Data_in = 12345678, mem_w = 0
+Addr_out = 00000105, Data_out = 00000000
+reg_sel =  7, reg_data = 00000005
+DMType_out = 0
+MemRead_out = 0
+----- IF/ID -----
+valid = 1, PC = 00000050, Inst = xxxxxxxx
+----- ID/EX -----
+valid = 1, PC = 0000004c, RD1 = xxxxxxxx, RD2 = xxxxxxxx, Imm = 00000000
+rs1 =  x, rs2 =  x, rd =  x, ALUOp = xx, ALUSrc = x, RegWrite = x, WDSel = xx, DMType = x, MemWrite = x
+----- EX/MEM -----
+valid = 1, PC = 00000048, ALUResult = 00000105, RD2 = 00000000, rd =  5
+RegWrite = 1, MemWrite = 0, WDSel = 00, DMType = 0, MemRead = 0
+----- MEM/WB -----
+valid = 1, PC = ffffffff, MemData = 12345678, ALUResult = 00000000, rd =  0
+RegWrite = 1, WDSel = 00
+
+Cycle 25
+----- Actual In and Out -----
+PC_out = 00000058, inst_in = xxxxxxxx
+Data_in = 12345678, mem_w = x
+Addr_out = 00000105, Data_out = xxxxxxxx
+reg_sel =  7, reg_data = 00000005
+DMType_out = x
+MemRead_out = x
+----- IF/ID -----
+valid = 1, PC = 00000054, Inst = xxxxxxxx
+----- ID/EX -----
+valid = 1, PC = 00000050, RD1 = xxxxxxxx, RD2 = xxxxxxxx, Imm = 00000000
+rs1 =  x, rs2 =  x, rd =  x, ALUOp = xx, ALUSrc = x, RegWrite = x, WDSel = xx, DMType = x, MemWrite = x
+----- EX/MEM -----
+valid = 1, PC = 0000004c, ALUResult = 00000105, RD2 = xxxxxxxx, rd =  x
+RegWrite = x, MemWrite = x, WDSel = xx, DMType = x, MemRead = x
+----- MEM/WB -----
+valid = 1, PC = 00000048, MemData = 12345678, ALUResult = 00000105, rd =  5
+RegWrite = 1, WDSel = 00
+
+Cycle 26
+----- Actual In and Out -----
+PC_out = 0000005c, inst_in = xxxxxxxx
+Data_in = 12345678, mem_w = x
+Addr_out = 00000105, Data_out = xxxxxxxx
+reg_sel =  7, reg_data = 00000005
+DMType_out = x
+MemRead_out = x
+----- IF/ID -----
+valid = 1, PC = 00000058, Inst = xxxxxxxx
+----- ID/EX -----
+valid = 1, PC = 00000054, RD1 = xxxxxxxx, RD2 = xxxxxxxx, Imm = 00000000
+rs1 =  x, rs2 =  x, rd =  x, ALUOp = xx, ALUSrc = x, RegWrite = x, WDSel = xx, DMType = x, MemWrite = x
+----- EX/MEM -----
+valid = 1, PC = 00000050, ALUResult = 00000105, RD2 = xxxxxxxx, rd =  x
+RegWrite = x, MemWrite = x, WDSel = xx, DMType = x, MemRead = x
+----- MEM/WB -----
+valid = 1, PC = 0000004c, MemData = 12345678, ALUResult = 00000105, rd =  x
+RegWrite = x, WDSel = xx
+
+Cycle 27
+----- Actual In and Out -----
+PC_out = 00000060, inst_in = xxxxxxxx
+Data_in = 12345678, mem_w = x
+Addr_out = 00000105, Data_out = xxxxxxxx
+reg_sel =  7, reg_data = 00000005
+DMType_out = x
+MemRead_out = x
+----- IF/ID -----
+valid = 1, PC = 0000005c, Inst = xxxxxxxx
+----- ID/EX -----
+valid = 1, PC = 00000058, RD1 = xxxxxxxx, RD2 = xxxxxxxx, Imm = 00000000
+rs1 =  x, rs2 =  x, rd =  x, ALUOp = xx, ALUSrc = x, RegWrite = x, WDSel = xx, DMType = x, MemWrite = x
+----- EX/MEM -----
+valid = 1, PC = 00000054, ALUResult = 00000105, RD2 = xxxxxxxx, rd =  x
+RegWrite = x, MemWrite = x, WDSel = xx, DMType = x, MemRead = x
+----- MEM/WB -----
+valid = 1, PC = 00000050, MemData = 12345678, ALUResult = 00000105, rd =  x
+RegWrite = x, WDSel = xx
+
+Cycle 28
+----- Actual In and Out -----
+PC_out = 00000064, inst_in = xxxxxxxx
+Data_in = 12345678, mem_w = x
+Addr_out = 00000105, Data_out = xxxxxxxx
+reg_sel =  7, reg_data = 00000005
+DMType_out = x
+MemRead_out = x
+----- IF/ID -----
+valid = 1, PC = 00000060, Inst = xxxxxxxx
+----- ID/EX -----
+valid = 1, PC = 0000005c, RD1 = xxxxxxxx, RD2 = xxxxxxxx, Imm = 00000000
+rs1 =  x, rs2 =  x, rd =  x, ALUOp = xx, ALUSrc = x, RegWrite = x, WDSel = xx, DMType = x, MemWrite = x
+----- EX/MEM -----
+valid = 1, PC = 00000058, ALUResult = 00000105, RD2 = xxxxxxxx, rd =  x
+RegWrite = x, MemWrite = x, WDSel = xx, DMType = x, MemRead = x
+----- MEM/WB -----
+valid = 1, PC = 00000054, MemData = 12345678, ALUResult = 00000105, rd =  x
+RegWrite = x, WDSel = xx
+
+Cycle 29
+----- Actual In and Out -----
+PC_out = 00000068, inst_in = xxxxxxxx
+Data_in = 12345678, mem_w = x
+Addr_out = 00000105, Data_out = xxxxxxxx
+reg_sel =  7, reg_data = 00000005
+DMType_out = x
+MemRead_out = x
+----- IF/ID -----
+valid = 1, PC = 00000064, Inst = xxxxxxxx
+----- ID/EX -----
+valid = 1, PC = 00000060, RD1 = xxxxxxxx, RD2 = xxxxxxxx, Imm = 00000000
+rs1 =  x, rs2 =  x, rd =  x, ALUOp = xx, ALUSrc = x, RegWrite = x, WDSel = xx, DMType = x, MemWrite = x
+----- EX/MEM -----
+valid = 1, PC = 0000005c, ALUResult = 00000105, RD2 = xxxxxxxx, rd =  x
+RegWrite = x, MemWrite = x, WDSel = xx, DMType = x, MemRead = x
+----- MEM/WB -----
+valid = 1, PC = 00000058, MemData = 12345678, ALUResult = 00000105, rd =  x
+RegWrite = x, WDSel = xx
+
+Cycle 30
+----- Actual In and Out -----
+PC_out = 0000006c, inst_in = xxxxxxxx
+Data_in = 12345678, mem_w = x
+Addr_out = 00000105, Data_out = xxxxxxxx
+reg_sel =  7, reg_data = 00000005
+DMType_out = x
+MemRead_out = x
+----- IF/ID -----
+valid = 1, PC = 00000068, Inst = xxxxxxxx
+----- ID/EX -----
+valid = 1, PC = 00000064, RD1 = xxxxxxxx, RD2 = xxxxxxxx, Imm = 00000000
+rs1 =  x, rs2 =  x, rd =  x, ALUOp = xx, ALUSrc = x, RegWrite = x, WDSel = xx, DMType = x, MemWrite = x
+----- EX/MEM -----
+valid = 1, PC = 00000060, ALUResult = 00000105, RD2 = xxxxxxxx, rd =  x
+RegWrite = x, MemWrite = x, WDSel = xx, DMType = x, MemRead = x
+----- MEM/WB -----
+valid = 1, PC = 0000005c, MemData = 12345678, ALUResult = 00000105, rd =  x
+RegWrite = x, WDSel = xx
+
+Cycle 31
+----- Actual In and Out -----
+PC_out = 00000070, inst_in = xxxxxxxx
+Data_in = 12345678, mem_w = x
+Addr_out = 00000105, Data_out = xxxxxxxx
+reg_sel =  7, reg_data = 00000005
+DMType_out = x
+MemRead_out = x
+----- IF/ID -----
+valid = 1, PC = 0000006c, Inst = xxxxxxxx
+----- ID/EX -----
+valid = 1, PC = 00000068, RD1 = xxxxxxxx, RD2 = xxxxxxxx, Imm = 00000000
+rs1 =  x, rs2 =  x, rd =  x, ALUOp = xx, ALUSrc = x, RegWrite = x, WDSel = xx, DMType = x, MemWrite = x
+----- EX/MEM -----
+valid = 1, PC = 00000064, ALUResult = 00000105, RD2 = xxxxxxxx, rd =  x
+RegWrite = x, MemWrite = x, WDSel = xx, DMType = x, MemRead = x
+----- MEM/WB -----
+valid = 1, PC = 00000060, MemData = 12345678, ALUResult = 00000105, rd =  x
+RegWrite = x, WDSel = xx
+
