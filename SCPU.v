@@ -60,6 +60,7 @@ module SCPU (
 
   reg [31:0] ALU_A;  // 前递后真正输入 ALU 的信号
   reg [31:0] ALU_B;
+  reg [31:0] ALU_RD2;
 
   // IF/ID
   // 考虑 beq 跳转成功(ID 阶段判断) flush 掉 IF 阶段的指令
@@ -118,6 +119,9 @@ module SCPU (
     end  // ID 阶段没准备好的 Stall
 
 
+
+
+
     else if (Stall_ID) begin
       ID_EX_Inst <= `NOP;
       ID_EX_PC <= 32'hffffffff;
@@ -165,7 +169,7 @@ module SCPU (
       EX_MEM_PC <= ID_EX_PC;  // 最终到 MEM_WB_PC
       EX_MEM_ALUResult <= aluout;
       EX_MEM_NPCOp <= NPCOp;
-      EX_MEM_RD2 <= ALU_B;  // S-type 的前递!
+      EX_MEM_RD2 <= ALU_RD2;  // S-type 的前递!
       EX_MEM_rd <= ID_EX_rd;
       EX_MEM_RegWrite <= ID_EX_RegWrite;
       EX_MEM_MemWrite <= ID_EX_MemWrite;
@@ -303,10 +307,14 @@ module SCPU (
       .reg_data(reg_data)
   );
 
-  wire [31:0] alu_B = (ID_EX_ALUSrc) ? ID_EX_Imm : ID_EX_RD2;
+  always @(*) begin
+    if (ID_EX_ALUSrc) ALU_B = ID_EX_Imm;
+    else ALU_B = ALU_RD2;
+  end
+
   alu U_alu (
       .A(ALU_A),
-      .B(ALU_B),
+      .B(ALU_B),  // 应该和立即数做加法
       .ALUOp(ID_EX_ALUOp),
       .C(aluout),
       .Zero(Zero),
@@ -383,10 +391,10 @@ module SCPU (
       default ALU_A <= ID_EX_RD1;
     endcase
     case (ForwardB[1:0])
-      2'b00: ALU_B <= alu_B;
-      2'b01: ALU_B <= MEM_WB_ALUResult;
-      2'b10: ALU_B <= EX_MEM_ALUResult;
-      default ALU_B <= alu_B;
+      2'b00: ALU_RD2 <= ID_EX_RD2;
+      2'b01: ALU_RD2 <= MEM_WB_ALUResult;
+      2'b10: ALU_RD2 <= EX_MEM_ALUResult;
+      default ALU_RD2 <= ID_EX_RD2;
     endcase
   end
 

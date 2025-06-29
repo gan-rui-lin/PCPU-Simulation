@@ -46,7 +46,8 @@ module dm (
       $display("dmem[0x%8X] = 0x%8X,", addr + 3, dmem[addr+3]);
     end
   end
-  always @(*) begin
+  always @(DMRd or DMType or addr or dmem[addr] or dmem[addr+1] or dmem[addr+2] or dmem[addr+3]) begin
+
     if (DMRd) begin
       case (DMType)
         `dm_byte: dout <= {{24{dmem[addr][7]}}, dmem[addr]};

@@ -1,3 +1,4 @@
 0x0	0x00500293	addi x5 x0 5	li x5,5
 0x4	0x00502223	sw x5 4(x0)	sw x5,4(x0)
 0x8	0x00402303	lw x6 4(x0)	lw x6,4(x0)
+0xc	0x00602223	sw x6 4(x0)	sw x6,4(x0)

@@ -53,3 +53,5 @@
 `define dm_byte_unsigned 3'b100
 
 `define NOP 32'h00000013
+
+`define Stype 7'b0100011
