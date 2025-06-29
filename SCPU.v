@@ -326,7 +326,13 @@ module SCPU (
 
   reg  [31:0] ALU_A_Btype;
   reg  [31:0] ALU_B_Btype;
-  wire [31:0] alu_B_ID = (ALUSrc) ? immout : RD2;
+  reg [31:0] ALU_RD2_Btype;
+
+  always @(*) begin
+    if (ALUSrc) ALU_B_Btype = immout;
+    else ALU_B_Btype = ALU_RD2_Btype;
+  end
+
   wire [31:0] not_used;
   alu U_alu_Btype (
       .A(ALU_A_Btype),
@@ -413,10 +419,10 @@ module SCPU (
     endcase
 
     case (ForwardB[3:2])
-      2'b00:   ALU_B_Btype = alu_B_ID;
-      2'b01:   ALU_B_Btype = WD;
-      2'b10:   ALU_B_Btype = EX_MEM_ALUResult;
-      default: ALU_B_Btype = alu_B_ID;
+      2'b00:   ALU_RD2_Btype = RD2;
+      2'b01:   ALU_RD2_Btype = WD;
+      2'b10:   ALU_RD2_Btype = EX_MEM_ALUResult;
+      default: ALU_RD2_Btype = RD2;
     endcase
   end
 
