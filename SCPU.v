@@ -339,6 +339,7 @@ module SCPU (
 
   // 在 MEM 阶段传递地址、待写数据(下周期真正写) 给DM 模块, WB 阶段读出 Data_in 准备写回寄存器(下周期写);
   assign Addr_out = EX_MEM_ALUResult; // 传给外层的 sccomp
+  // Data_in 也要前递出去才行
   assign Data_out = EX_MEM_RD2;     // 传给外层的 sccomp
   assign mem_w = EX_MEM_MemWrite;   // 传给外层的 sccomp
   assign DMType_out = EX_MEM_DMType;
@@ -389,13 +390,14 @@ module SCPU (
   always @(*) begin
     case (ForwardA[1:0])
       2'b00: ALU_A <= ID_EX_RD1;
-      2'b01: ALU_A <= MEM_WB_ALUResult;
+      // 这里的 MEM_EX 旁路, 只能是将即将要写回RF的值(WD)往EX送,其它均不准确
+      2'b01: ALU_A <= WD;
       2'b10: ALU_A <= EX_MEM_ALUResult;
       default ALU_A <= ID_EX_RD1;
     endcase
     case (ForwardB[1:0])
       2'b00: ALU_RD2 <= ID_EX_RD2;
-      2'b01: ALU_RD2 <= MEM_WB_ALUResult;
+      2'b01: ALU_RD2 <= WD;
       2'b10: ALU_RD2 <= EX_MEM_ALUResult;
       default ALU_RD2 <= ID_EX_RD2;
     endcase
