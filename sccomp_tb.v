@@ -25,7 +25,7 @@ module sccomp_tb ();
     // 192);
       // $readmemh("sim1.dat", U_SCCOMP.U_IM.ROM, 0, 30);
       // $readmemh("sim2_f.dat", U_SCCOMP.U_IM.ROM, 0, 23);
-      $readmemh("hhh.dat", U_SCCOMP.U_IM.ROM, 0, 2);
+      $readmemh("hhh.dat", U_SCCOMP.U_IM.ROM, 0, 4);
     // $monitor("PC = 0x%8X, instr = 0x%8X", U_SCCOMP.PC, U_SCCOMP.instr); // used for debug
     foutput = $fopen("results.txt");
     debug_output = $fopen("debug.txt");
@@ -103,6 +103,7 @@ module sccomp_tb ();
           $fdisplay(debug_output, "reg_sel = %d, reg_data = %h", U_SCCOMP.U_SCPU.reg_sel,
                     U_SCCOMP.U_SCPU.reg_data);
           $fdisplay(debug_output, "DMType_out = %h", U_SCCOMP.U_SCPU.DMType_out);
+          $fdisplay(debug_output, "MemRead_out = %h", U_SCCOMP.U_SCPU.MemRead_out);
 
 
           // ----- IF/ID -----
@@ -130,9 +131,10 @@ module sccomp_tb ();
                     U_SCCOMP.U_SCPU.EX_MEM_valid, U_SCCOMP.U_SCPU.EX_MEM_PC,
                     U_SCCOMP.U_SCPU.EX_MEM_ALUResult, U_SCCOMP.U_SCPU.EX_MEM_RD2,
                     U_SCCOMP.U_SCPU.EX_MEM_rd);
-          $fdisplay(debug_output, "RegWrite = %b, MemWrite = %b, WDSel = %b, DMType = %h",
+          $fdisplay(debug_output, "RegWrite = %b, MemWrite = %b, WDSel = %b, DMType = %h, MemRead = %h",
                     U_SCCOMP.U_SCPU.EX_MEM_RegWrite, U_SCCOMP.U_SCPU.EX_MEM_MemWrite,
-                    U_SCCOMP.U_SCPU.EX_MEM_WDSel, U_SCCOMP.U_SCPU.EX_MEM_DMType);
+                    U_SCCOMP.U_SCPU.EX_MEM_WDSel, U_SCCOMP.U_SCPU.EX_MEM_DMType, 
+                    U_SCCOMP.U_SCPU.EX_MEM_MemRead);
 
           // ----- MEM/WB -----
           $fdisplay(debug_output, "----- MEM/WB -----");

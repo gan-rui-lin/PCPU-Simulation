@@ -3,6 +3,7 @@
 module dm (
     clk,
     DMWr,
+    DMRd,
     addr,
     din,
     DMType,
@@ -10,6 +11,7 @@ module dm (
 );
   input clk;
   input DMWr;
+  input DMRd;
   input [8:0] addr;
   input [31:0] din;
   input [2:0] DMType;
@@ -45,15 +47,19 @@ module dm (
     end
   end
   always @(*) begin
-    case (DMType)
-      `dm_byte: dout = {{24{dmem[addr][7]}}, dmem[addr][7:0]};
-      `dm_byte_unsigned: dout = {24'b0, dmem[addr][7:0]};
-      `dm_halfword: dout <= {{16{dmem[addr+1][7]}}, dmem[addr+1][7:0], dmem[addr][7:0]};
-      `dm_halfword_unsigned: dout <= {16'b0, dmem[addr+1][7:0], dmem[addr][7:0]};
-      `dm_word:
-      dout <= {{dmem[addr+3][7:0]}, {dmem[addr+2][7:0]}, {dmem[addr+1][7:0]}, dmem[addr][7:0]};
-      default: dout <= 32'b0;
-    endcase
+    if (DMRd) begin
+      case (DMType)
+        `dm_byte: dout <= {{24{dmem[addr][7]}}, dmem[addr]};
+        `dm_byte_unsigned: dout <= {24'b0, dmem[addr]};
+        `dm_halfword: dout <= {{16{dmem[addr+1][7]}}, dmem[addr+1], dmem[addr]};
+        `dm_halfword_unsigned: dout <= {16'b0, dmem[addr+1], dmem[addr]};
+        `dm_word: dout <= {dmem[addr+3], dmem[addr+2], dmem[addr+1], dmem[addr]};
+        default: dout <= 32'hFFFFFFFF;
+      endcase
+    end else begin
+      dout <= 32'h12345678;
+    end
   end
+
 
 endmodule

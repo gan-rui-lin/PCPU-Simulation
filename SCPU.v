@@ -11,9 +11,10 @@ module SCPU (
     output [31:0] Addr_out,  // ALU output
     output [31:0] Data_out,  // data to data memory
 
-    input  [ 4:0] reg_sel,    // register selection (for debug use)
-    output [31:0] reg_data,   // selected register data (for debug use)
-    output [ 2:0] DMType_out
+    input [4:0] reg_sel,  // register selection (for debug use)
+    output [31:0] reg_data,  // selected register data (for debug use)
+    output [2:0] DMType_out,
+    output MemRead_out
 );
   wire        MemWrite;
   wire        MemRead;
@@ -57,16 +58,18 @@ module SCPU (
   wire Stall_ID = Stall[0];
   wire Stall_EX = Stall[1];
 
+  reg [31:0] ALU_A;  // 前递后真正输入 ALU 的信号
+  reg [31:0] ALU_B;
 
   // IF/ID
   // 考虑 beq 跳转成功(ID 阶段判断) flush 掉 IF 阶段的指令
-  reg  IF_ID_valid;
-  reg  IF_Flush;
+  reg IF_ID_valid;
+  reg IF_Flush;
   reg [31:0] IF_ID_PC, IF_ID_Inst;
   always @(posedge clk) begin
     if (reset) begin
       IF_ID_valid <= 0;
-    // 被 flush 掉了!
+      // 被 flush 掉了!
     end else if (Stall) begin
       IF_ID_PC   <= IF_ID_PC;
       IF_ID_Inst <= IF_ID_Inst;
@@ -112,14 +115,14 @@ module SCPU (
       ID_EX_valid <= 0;
       ID_EX_NPCOp <= `NPC_PLUS4;  // 初始化为默认值
       ID_EX_PC <= 0;
-    end 
-    // ID 阶段没准备好的 Stall
-    else if(Stall_ID) begin
+    end  // ID 阶段没准备好的 Stall
+
+
+    else if (Stall_ID) begin
       ID_EX_Inst <= `NOP;
       ID_EX_PC <= 32'hffffffff;
       ID_EX_NPCOp <= `NPC_PLUS4;  // 初始化为默认值
-    end
-    else begin // 否则保持原样
+    end else begin  // 否则保持原样
       ID_EX_Inst <= IF_ID_Inst;
       ID_EX_valid <= IF_ID_valid;
       ID_EX_PC <= IF_ID_PC;  // 往后传就是了
@@ -140,6 +143,8 @@ module SCPU (
     end
   end
 
+
+
   // EX/MEM
   reg EX_MEM_valid;
   reg [31:0] EX_MEM_ALUResult, EX_MEM_RD2, EX_MEM_PC, EX_MEM_Inst;
@@ -151,16 +156,16 @@ module SCPU (
   always @(posedge clk) begin
     if (reset) EX_MEM_valid <= 0;
     // EX 阶段没准备好的 Stall
-    else if(Stall_EX) begin
+    else if (Stall_EX) begin
       EX_MEM_Inst <= `NOP;
-      EX_MEM_PC <= 32'hffffffff;
+      EX_MEM_PC   <= 32'hffffffff;
     end else begin
       EX_MEM_Inst <= ID_EX_Inst;
       EX_MEM_valid <= ID_EX_valid;
       EX_MEM_PC <= ID_EX_PC;  // 最终到 MEM_WB_PC
       EX_MEM_ALUResult <= aluout;
       EX_MEM_NPCOp <= NPCOp;
-      EX_MEM_RD2 <= ID_EX_RD2;
+      EX_MEM_RD2 <= ALU_B;  // S-type 的前递!
       EX_MEM_rd <= ID_EX_rd;
       EX_MEM_RegWrite <= ID_EX_RegWrite;
       EX_MEM_MemWrite <= ID_EX_MemWrite;
@@ -170,13 +175,13 @@ module SCPU (
     end
   end
 
-  assign DMType_out = EX_MEM_DMType;
+
 
   // MEM/WB
   reg MEM_WB_valid;
   reg [31:0] MEM_WB_MemData, MEM_WB_ALUResult, MEM_WB_PC, MEM_WB_RD2, MEM_WB_Inst;
   reg [4:0] MEM_WB_rd;
-  reg MEM_WB_RegWrite, MEM_WB_MemWrite;
+  reg MEM_WB_RegWrite, MEM_WB_MemWrite, MEM_WB_MemRead;
   reg [1:0] MEM_WB_WDSel;
   always @(posedge clk) begin
     if (reset) MEM_WB_valid <= 0;
@@ -270,7 +275,7 @@ module SCPU (
       .PC(True_PC_for_next),
       .NPCOp(True_NPCOp),
       .IMM(immout),
-      .aluout(jalr_next),  // TO BE MODIFIED
+      .aluout(jalr_next),
       .NPC(NPC)
   );
   EXT U_EXT (
@@ -299,8 +304,6 @@ module SCPU (
   );
 
   wire [31:0] alu_B = (ID_EX_ALUSrc) ? ID_EX_Imm : ID_EX_RD2;
-  reg  [31:0] ALU_A;
-  reg  [31:0] ALU_B;
   alu U_alu (
       .A(ALU_A),
       .B(ALU_B),
@@ -327,6 +330,8 @@ module SCPU (
   assign Addr_out = EX_MEM_ALUResult; // 传给外层的 sccomp
   assign Data_out = EX_MEM_RD2;     // 传给外层的 sccomp
   assign mem_w = EX_MEM_MemWrite;   // 传给外层的 sccomp
+  assign DMType_out = EX_MEM_DMType;
+  assign MemRead_out = EX_MEM_MemRead;
 
   always @* begin
     case (MEM_WB_WDSel)
@@ -353,7 +358,7 @@ module SCPU (
       .ForwardA(ForwardA),
       .ForwardB(ForwardB),
       .EX_MEM_MemRead(EX_MEM_MemRead),
-      .MEM_WB_MemRead (MEM_WB_MemRead)
+      .MEM_WB_MemRead(MEM_WB_MemRead)
   );
 
   Hazard_detection U_Hazard_Detection (
@@ -365,7 +370,7 @@ module SCPU (
       .ID_EX_rd      (ID_EX_rd),
       .EX_MEM_rd     (EX_MEM_rd),
       .Stall         (Stall),
-      .NPCOp(NPCOp)
+      .NPCOp         (NPCOp)
   );
 
 
