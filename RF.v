@@ -31,11 +31,9 @@ module RF (
 
 
   // "WB-EX" 旁路
-assign RD1 = (A1 == 0) ? 32'b0 :
-             (A1 == A3 && WD !== 32'hxxxxxxxx) ? WD : rf[A1];
+  assign RD1 = (A1 == 0) ? 32'b0 : (A1 == A3) ? WD : rf[A1];
 
-assign RD2 = (A2 == 0) ? 32'b0 :
-             (A2 == A3 && WD !== 32'hxxxxxxxx ) ? WD : rf[A2];
+  assign RD2 = (A2 == 0) ? 32'b0 : (A2 == A3) ? WD : rf[A2];
 
   assign reg_data = (reg_sel != 0) ? rf[reg_sel] : 0;
 
