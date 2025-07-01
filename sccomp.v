@@ -4,7 +4,9 @@ module sccomp (
     input rstn,
     input [15:0] sw_i,
     output [7:0] disp_an_o,
-    output [7:0] disp_seg_o
+    output [7:0] disp_seg_o,
+    input [4:0] reg_sel,
+    output [31:0] reg_data
 );
 
 
@@ -41,6 +43,9 @@ module sccomp (
   wire clk_addr = fast_disp ? clk_fast : clk_slow;
   assign clk_used = pc_pause ? 1'b0 : clk_addr;
 
+  // for running tb file
+  // assign clk_used = clk;
+
   wire rom_disp = sw_i[14], rf_disp = sw_i[13], alu_disp = sw_i[12], dm_disp = sw_i[11], imm_disp = sw_i[10], pc_disp = sw_i[9];
 
   /* ----------------- logic part ----------------- */
@@ -63,7 +68,7 @@ module sccomp (
 
   // instantiation of single-cycle CPU   
   SCPU U_SCPU (
-      .clk        (clk_used),           // input:  cpu clock
+      .clk        (clk_used),      // input:  cpu clock
       .reset      (rst),           // input:  reset
       .inst_in    (instr),         // input:  instruction
       .Data_in    (dm_dout),       // input:  data to cpu  
@@ -79,7 +84,7 @@ module sccomp (
 
   // instantiation of data memory  
   dm U_DM (
-      .clk   (clk_used),           // input:  cpu clock
+      .clk   (clk_used),      // input:  cpu clock
       .DMWr  (MemWrite),      // input:  ram write
       .DMRd  (MemRead),
       .DMType(DMType),
@@ -103,14 +108,14 @@ module sccomp (
       .data_out(rf_addr)
   );
 
-  addr_controller #(
-      .ADDR_SIZE(`ALU_SIZE)
-  ) u_alu_addr (
-      .clk(clk_addr),
-      .rstn(rstn),
-      .addr_pause(alu_pause),
-      .data_out(alu_addr)
-  );
+  // addr_controller #(
+  //     .ADDR_SIZE(`ALU_SIZE)
+  // ) u_alu_addr (
+  //     .clk(clk_addr),
+  //     .rstn(rstn),
+  //     .addr_pause(alu_pause),
+  //     .data_out(alu_addr)
+  // );
 
   //   always @(posedge clk_addr) begin
   //     rf_disp_data <= u_rf.register_file[rf_addr];
