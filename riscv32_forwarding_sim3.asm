@@ -46,3 +46,24 @@
 0x40	0x00802683	lw x13 8(x0)	lw x13, 8(x0)
 0x44	0x00068067	jalr x0 x13 0	jalr x0, x13, 0 #jalr x0, br2ret
 0x48	0x10028293	addi x5 x5 256	end: addi x5, x5, 0x100
+
+
+0x00500293	addi x5 x0 5	main: addi x5, x0, 5
+0x00502023	sw x5 0(x0)	sw x5, 0(x0) #mem[0] = 5
+0x00002303	lw x6 0(x0)	lw x6, 0(x0)
+0x00230393	addi x7 x6 2	addi x7, x6, 2 #load-use data hazard, stall one cycle, x7 = 7
+0x00700413	addi x8 x0 7	addi x8, x0, 7
+0x00838E63	beq x7 x8 28	beq x7, x8, br1 #arith-beq data hazard, stall one cycle
+0x00A00513	addi x10 x0 10	addi x10, x0, 10 #should not run
+0x00002383	lw x7 0(x0)	br1ret: lw x7, 0(x0) #x7 = 5
+0x00728C63	beq x5 x7 24	beq x5, x7, br2 #lw-beq data hazard, stall two cycles
+0x00A00513	addi x10 x0 10	addi x10, x0, 10 #should not run
+0x00100713	addi x14 x0 1	br2ret: addi x14, x0, 1
+0x01C0006F	jal x0 28	jal x0, end
+0x01C00593	addi x11 x0 28	br1: addi x11, x0, 0x1c
+0x00058067	jalr x0 x11 0	jalr x0, x11, 0
+0x02800613	addi x12 x0 40	br2: addi x12, x0, 40
+0x00C02423	sw x12 8(x0)	sw x12, 8(x0)
+0x00802683	lw x13 8(x0)	lw x13, 8(x0)
+0x00068067	jalr x0 x13 0	jalr x0, x13, 0 #jalr x0, br2ret
+0x10028293	addi x5 x5 256	end: addi x5, x5, 0x100

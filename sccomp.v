@@ -4,9 +4,9 @@ module sccomp (
     input rstn,
     input [15:0] sw_i,
     output [7:0] disp_an_o,
-    output [7:0] disp_seg_o,
-    input [4:0] reg_sel,
-    output [31:0] reg_data
+    output [7:0] disp_seg_o
+//    input [4:0] reg_sel,
+//    output [31:0] reg_data
 );
 
 
@@ -52,7 +52,7 @@ module sccomp (
   wire [$clog2(`RF_SIZE)-1:0] rf_addr;
   //   wire [$clog2(`ALU_SIZE)-1:0] alu_addr;
   //   wire [$clog2(`DM_SIZE)-1:0] dm_addr_sel;
-  reg [31:0] rf_disp_data;
+  wire [31:0] rf_disp_data;
   //   reg [31:0] alu_disp_data;
   //   reg [31:0] dm_disp_data;
 
@@ -94,9 +94,14 @@ module sccomp (
   );
 
   // instantiation of intruction memory (used for simulation)
-  im U_IM (
-      .addr(PC[31:2]),  // input:  rom address
-      .dout(instr)     // output: instruction
+//  im U_IM (
+//      .addr(PC[31:2]),  // input:  rom address
+//      .dout(instr)     // output: instruction
+//  );
+
+  dist_mem_gen_0 U_IM (
+      .a(PC[31:2]),  // input:  rom address
+      .spo(instr)     // output: instruction
   );
 
   addr_controller #(
@@ -146,7 +151,7 @@ module sccomp (
         disp_data = instr;
       end
       `RF_DISP: begin
-        disp_data = rf_disp_data;
+        disp_data = {3'b0, rf_addr,rf_disp_data[23:0]};
       end
       //   `ALU_DISP: begin
       //     disp_data = alu_disp_data;
