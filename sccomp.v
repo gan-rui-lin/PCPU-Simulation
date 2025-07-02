@@ -4,9 +4,9 @@ module sccomp (
     input rstn,
     input [15:0] sw_i,
     output [7:0] disp_an_o,
-    output [7:0] disp_seg_o
-//    input [4:0] reg_sel,
-//    output [31:0] reg_data
+    output [7:0] disp_seg_o,
+    input [4:0] reg_sel,
+    output [31:0] reg_data
 );
 
 
@@ -41,10 +41,10 @@ module sccomp (
   );
 
   wire clk_addr = fast_disp ? clk_fast : clk_slow;
-  assign clk_used = pc_pause ? 1'b0 : clk_addr;
+  // assign clk_used = pc_pause ? 1'b0 : clk_addr;
 
   // for running tb file
-  // assign clk_used = clk;
+  assign clk_used = clk;
 
   wire rom_disp = sw_i[14], rf_disp = sw_i[13], alu_disp = sw_i[12], dm_disp = sw_i[11], imm_disp = sw_i[10], pc_disp = sw_i[9];
 
@@ -52,7 +52,7 @@ module sccomp (
   wire [$clog2(`RF_SIZE)-1:0] rf_addr;
   //   wire [$clog2(`ALU_SIZE)-1:0] alu_addr;
   //   wire [$clog2(`DM_SIZE)-1:0] dm_addr_sel;
-  wire [31:0] rf_disp_data;
+  reg [31:0] rf_disp_data;
   //   reg [31:0] alu_disp_data;
   //   reg [31:0] dm_disp_data;
 
@@ -68,15 +68,15 @@ module sccomp (
 
   // instantiation of single-cycle CPU   
   SCPU U_SCPU (
-      .clk        (clk_used),      // input:  cpu clock
-      .reset      (rst),           // input:  reset
-      .inst_in    (instr),         // input:  instruction
-      .Data_in    (dm_dout),       // input:  data to cpu  
-      .mem_w      (MemWrite),      // output: memory write signal
-      .PC_out     (PC),            // output: PC
-      .Addr_out   (dm_addr),       // output: address from cpu to memory
-      .Data_out   (dm_din),        // output: data from cpu to memory
-      .reg_sel    (rf_addr),       // input:  register selection
+      .clk        (clk_used),  // input:  cpu clock
+      .reset      (rst),       // input:  reset
+      .inst_in    (instr),     // input:  instruction
+      .Data_in    (dm_dout),   // input:  data to cpu  
+      .mem_w      (MemWrite),  // output: memory write signal
+      .PC_out     (PC),        // output: PC
+      .Addr_out   (dm_addr),   // output: address from cpu to memory
+      .Data_out   (dm_din),    // output: data from cpu to memory
+      .reg_sel    (rf_addr),   // input:  register selection
       .reg_data   (rf_disp_data),  // output: register data
       .DMType_out (DMType),
       .MemRead_out(MemRead)
@@ -94,14 +94,9 @@ module sccomp (
   );
 
   // instantiation of intruction memory (used for simulation)
-//  im U_IM (
-//      .addr(PC[31:2]),  // input:  rom address
-//      .dout(instr)     // output: instruction
-//  );
-
-  dist_mem_gen_0 U_IM (
-      .a(PC[31:2]),  // input:  rom address
-      .spo(instr)     // output: instruction
+  im U_IM (
+      .addr(PC[31:2]),  // input:  rom address
+      .dout(instr)     // output: instruction
   );
 
   addr_controller #(
@@ -151,7 +146,7 @@ module sccomp (
         disp_data = instr;
       end
       `RF_DISP: begin
-        disp_data = {3'b0, rf_addr,rf_disp_data[23:0]};
+        disp_data = rf_disp_data;
       end
       //   `ALU_DISP: begin
       //     disp_data = alu_disp_data;
