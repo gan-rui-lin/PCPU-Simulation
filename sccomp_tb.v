@@ -16,6 +16,7 @@ module sccomp_tb ();
   integer foutput;
   integer debug_output;
   integer pc_output;
+  integer reg_output;
   integer counter = 0;
 
   initial begin
@@ -24,8 +25,14 @@ module sccomp_tb ();
     // $readmemh("sim6.dat", U_SCCOMP.U_IM.ROM, 0, 
     // 192);
       // $readmemh("sim1.dat", U_SCCOMP.U_IM.ROM, 0, 30);
+      // $readmemh("sim1_f.dat", U_SCCOMP.U_IM.ROM, 0, 30);
       // $readmemh("sim2_f.dat", U_SCCOMP.U_IM.ROM, 0, 26);
       $readmemh("sim3_f.dat", U_SCCOMP.U_IM.ROM, 0, 30);
+      // $readmemh("sim4_f.dat", U_SCCOMP.U_IM.ROM, 0, 30);
+      // $readmemh("riscv32_sort_sim.dat", U_SCCOMP.U_IM.ROM, 0, 80);
+      // $readmemh("fib_test.dat", U_SCCOMP.U_IM.ROM, 0, 80);
+      
+
       // $readmemh("hhh.dat", U_SCCOMP.U_IM.ROM, 0, 30);
     // $monitor("PC = 0x%8X, instr = 0x%8X", U_SCCOMP.PC, U_SCCOMP.instr); // used for debug
     foutput = $fopen("results.txt");
@@ -52,7 +59,8 @@ module sccomp_tb ();
         $fclose(foutput);
         $stop;
       end else begin
-        if (U_SCCOMP.PC == 32'h314) begin
+        if (U_SCCOMP.PC == 32'h100) begin
+        // if (U_SCCOMP.PC == 32'hA8) begin
           counter = counter + 1;
           $fdisplay(foutput, "pc:\t %h", U_SCCOMP.PC);
           $fdisplay(foutput, "instr:\t\t %h", U_SCCOMP.instr);

@@ -154,6 +154,6 @@ module ctrl (
   assign DMType[1] = is_lhu | is_sb | is_lb;
   assign DMType[2] = is_lbu;
 
-  assign MemRead = is_itype_l;
+  assign MemRead = is_itype_l | is_jalr;
 
 endmodule

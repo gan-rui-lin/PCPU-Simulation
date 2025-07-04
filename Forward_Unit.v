@@ -30,10 +30,10 @@ module Forward_unit (
   // 对于 ID 阶段不适用: 
   // 它不能等待到 EX 阶段而必须就是 ID 阶段已经拿到
   // addi; beq 序列需要阻塞一个周期, 从而从 EX_MEM_ALU_RESULT 里面获取 ALUOUT
-  wire ID_EX_ForwardA = (EX_MEM_rd != 0) && (EX_MEM_rd == rs1) && (EX_MEM_RegWrite) && (!EX_MEM_MemRead) && (NPCOp == `NPC_BRANCH || NPCOp == `NPC_JALR || NPCOp == `NPC_JUMP);
+  wire ID_EX_ForwardA = (EX_MEM_rd != 0) && (EX_MEM_rd == rs1) && (EX_MEM_RegWrite) && (!EX_MEM_MemRead) && (NPCOp == `NPC_BRANCH || NPCOp == `NPC_JALR);
 
   // lw;   beq 序列需要阻塞两个周期, 从而从 MEM_WB_MEMDATA 里面获取 MEMDATA
-  wire ID_MEM_ForwardA = (MEM_WB_rd != 0) && (MEM_WB_rd == rs1) && MEM_WB_MemRead && (NPCOp == `NPC_BRANCH || NPCOp == `NPC_JALR || NPCOp == `NPC_JUMP) && !ID_EX_ForwardA;
+  wire ID_MEM_ForwardA = (MEM_WB_rd != 0) && (MEM_WB_rd == rs1) && MEM_WB_MemRead && (NPCOp == `NPC_BRANCH || NPCOp == `NPC_JALR) && !ID_EX_ForwardA;
 
   /* ----------- ForwardB ----------- */
 
@@ -42,11 +42,11 @@ module Forward_unit (
   // 送出 WD(可能是 ALUOut 或者 MemData)
   wire MEM_WB_ForwardB = (MEM_WB_rd != 0) && (MEM_WB_rd == ID_EX_rs2) && (MEM_WB_RegWrite || MEM_WB_MemRead) && !EX_MEM_ForwardB;
 
-  wire ID_EX_ForwardB = (EX_MEM_rd != 0) && (EX_MEM_rd == rs2) && (EX_MEM_RegWrite) && (!EX_MEM_MemRead) && (NPCOp == `NPC_BRANCH || NPCOp == `NPC_JALR || NPCOp == `NPC_JUMP);
+  wire ID_EX_ForwardB = (EX_MEM_rd != 0) && (EX_MEM_rd == rs2) && (EX_MEM_RegWrite) && (!EX_MEM_MemRead) && (NPCOp == `NPC_BRANCH || NPCOp == `NPC_JALR);
 
   // 它不能等待到 EX 阶段而必须就是 ID 阶段已经拿到, 所以 EX_MEM_ALU_RESULT 更合适
   // lw;   beq 序列需要阻塞两个周期, 从而从 MEM_WB_MEMDATA 里面获取 MEMDATA
-  wire ID_MEM_ForwardB = (MEM_WB_rd != 0) && (MEM_WB_rd == rs2) && MEM_WB_MemRead && (NPCOp == `NPC_BRANCH || NPCOp == `NPC_JALR || NPCOp == `NPC_JUMP) && !ID_EX_ForwardB;
+  wire ID_MEM_ForwardB = (MEM_WB_rd != 0) && (MEM_WB_rd == rs2) && MEM_WB_MemRead && (NPCOp == `NPC_BRANCH || NPCOp == `NPC_JALR) && !ID_EX_ForwardB;
 
   // 优先 forward EX_MEM 旁路的值 
   assign ForwardA = {ID_EX_ForwardA, ID_MEM_ForwardA, EX_MEM_ForwardA, MEM_WB_ForwardA};

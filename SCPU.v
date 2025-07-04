@@ -129,6 +129,10 @@ module SCPU (
       ID_EX_RegWrite <= 0;
       ID_EX_DMType <= 0;
       ID_EX_MemWrite <= 0;
+      ID_EX_rd <= 0;
+      ID_EX_rs1 <= 0;
+      ID_EX_rs2 <= 0;
+      ID_EX_WDSel <= 0;
     end else begin  // 否则保持原样
       ID_EX_Inst <= IF_ID_Inst;
       ID_EX_valid <= IF_ID_valid;
@@ -397,6 +401,7 @@ module SCPU (
     case (ForwardA[1:0])
       2'b00: ALU_A <= ID_EX_RD1;
       // 这里的 MEM_EX 旁路, 只能是将即将要写回RF的值(WD)往EX送,其它均不准确
+      // Reg Use 或者 Load Use 都有可能
       2'b01: ALU_A <= WD;
       2'b10: ALU_A <= EX_MEM_ALUResult;
       default ALU_A <= ID_EX_RD1;
