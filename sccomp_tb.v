@@ -30,7 +30,7 @@ module sccomp_tb ();
       $readmemh("sim3_f.dat", U_SCCOMP.U_IM.ROM, 0, 30);
       // $readmemh("sim4_f.dat", U_SCCOMP.U_IM.ROM, 0, 30);
       // $readmemh("riscv32_sort_sim.dat", U_SCCOMP.U_IM.ROM, 0, 80);
-      // $readmemh("fib_test.dat", U_SCCOMP.U_IM.ROM, 0, 80);
+      // $readmemh("self_abab.dat", U_SCCOMP.U_IM.ROM, 0, 80);
       
 
       // $readmemh("hhh.dat", U_SCCOMP.U_IM.ROM, 0, 30);
